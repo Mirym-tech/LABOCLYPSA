@@ -1,13 +1,15 @@
+// Node.js 20 no tiene WebSocket nativo — Supabase lo necesita aunque no usemos realtime
+if (typeof globalThis.WebSocket === 'undefined') {
+  globalThis.WebSocket = require('ws');
+}
+
 const { createClient } = require('@supabase/supabase-js');
 
 const url = (process.env.SUPABASE_URL || '').trim();
 const key = (process.env.SUPABASE_SERVICE_KEY || '').trim();
 
-console.log('Supabase URL recibida:', url ? `"${url.substring(0, 30)}..."` : 'VACIA');
-console.log('Supabase KEY recibida:', key ? 'SET ✓' : 'VACIA ✗');
-
 if (!url || !key) {
-  throw new Error(`Variables de Supabase faltantes. URL="${url}" KEY="${key ? 'SET' : 'EMPTY'}"`);
+  throw new Error(`Variables de Supabase faltantes — SUPABASE_URL o SUPABASE_SERVICE_KEY no configuradas`);
 }
 
 const supabase = createClient(url, key, {
