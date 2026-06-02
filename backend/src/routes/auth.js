@@ -5,44 +5,53 @@ const audit = require('../helpers/audit');
 
 // POST /api/auth/login
 router.post('/login', async (req, res) => {
-  const { email, password } = req.body;
-  if (!email || !password) return res.status(400).json({ error: 'Email y contraseña son requeridos' });
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) return res.status(400).json({ error: 'Email y contraseña son requeridos' });
 
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) return res.status(401).json({ error: 'Credenciales incorrectas' });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
-  const { data: perfil } = await supabase
-    .from('perfiles')
-    .select('*, laboratorios(*)')
-    .eq('id', data.user.id)
-    .single();
+    if (error) return res.status(401).json({ error: 'Credenciales incorrectas' });
 
-  if (!perfil) return res.status(403).json({ error: 'Usuario sin perfil asignado. Contacte al administrador.' });
-  if (!perfil.activo) return res.status(403).json({ error: 'Usuario desactivado' });
+    if (!data.session) {
+      return res.status(403).json({ error: 'Debes confirmar tu correo electrónico antes de iniciar sesión. Revisa tu bandeja de entrada o desactiva la confirmación de email en Supabase.' });
+    }
 
-  // Registrar login en auditoría
-  await supabase.from('auditoria').insert({
-    usuario_id: data.user.id,
-    usuario_nombre: perfil.nombre_completo,
-    accion: 'login',
-    laboratorio_id: perfil.laboratorio_id,
-    ip_address: req.ip,
-  });
+    const { data: perfil } = await supabase
+      .from('perfiles')
+      .select('*, laboratorios(*)')
+      .eq('id', data.user.id)
+      .single();
 
-  res.json({
-    token: data.session.access_token,
-    user: {
-      id: data.user.id,
-      email: data.user.email,
-      nombre_completo: perfil.nombre_completo,
-      rol: perfil.rol,
-      laboratorio: perfil.laboratorios,
+    if (!perfil) return res.status(403).json({ error: 'Usuario sin perfil asignado. Contacte al administrador.' });
+    if (!perfil.activo) return res.status(403).json({ error: 'Usuario desactivado' });
+
+    await supabase.from('auditoria').insert({
+      usuario_id: data.user.id,
+      usuario_nombre: perfil.nombre_completo,
+      accion: 'login',
       laboratorio_id: perfil.laboratorio_id,
-    },
-  });
+      ip_address: req.ip,
+    });
+
+    res.json({
+      token: data.session.access_token,
+      user: {
+        id: data.user.id,
+        email: data.user.email,
+        nombre_completo: perfil.nombre_completo,
+        rol: perfil.rol,
+        laboratorio: perfil.laboratorios,
+        laboratorio_id: perfil.laboratorio_id,
+      },
+    });
+  } catch (err) {
+    console.error('Login error:', err);
+    res.status(500).json({ error: 'Error interno del servidor', details: err.message });
+  }
 });
 
-// GET /api/auth/me — verificar token y obtener datos del usuario
+// GET /api/auth/me
 router.get('/me', requireAuth, (req, res) => {
   const { perfil } = req.user;
   res.json({
