@@ -1,9 +1,10 @@
 {
   "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/backend" },
     { "source": "/", "destination": "/login.html" }
   ],
   "functions": {
-    "api/[...path].js": {
+    "api/backend.js": {
       "maxDuration": 30
     }
   }
