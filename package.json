@@ -1,10 +1,6 @@
 {
   "name": "laboclypsa",
   "version": "1.0.0",
-  "scripts": {
-    "start": "node backend/src/app.js",
-    "build": "npm install --prefix backend"
-  },
   "engines": {
     "node": ">=20"
   }
