@@ -16,17 +16,7 @@ const app = express();
 
 app.use(helmet());
 
-const corsOptions = {
-  origin: (origin, callback) => {
-    // En desarrollo permite cualquier origen (incluye file://, Live Server, etc.)
-    if (process.env.NODE_ENV !== 'production') return callback(null, true);
-    // En producción solo permite el frontend registrado
-    if (!origin || origin === process.env.FRONTEND_URL) return callback(null, true);
-    callback(new Error('CORS: origen no permitido'));
-  },
-  credentials: true,
-};
-app.use(cors(corsOptions));
+app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 300, standardHeaders: true }));
 
