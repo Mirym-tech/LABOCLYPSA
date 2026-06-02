@@ -1,7 +1,7 @@
 const { createClient } = require('@supabase/supabase-js');
 
 if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY) {
-  throw new Error('Faltan SUPABASE_URL o SUPABASE_SERVICE_KEY en el archivo .env');
+  console.error('⚠️  FALTAN VARIABLES: SUPABASE_URL o SUPABASE_SERVICE_KEY no están configuradas');
 }
 
 // Service role key — acceso completo, omite RLS.
