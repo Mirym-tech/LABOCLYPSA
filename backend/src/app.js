@@ -1,5 +1,4 @@
-// Carga .env si existe (development). En Railway las vars vienen de Settings > Variables.
-require('dotenv').config({ path: require('path').join(__dirname, '../.env') });
+require('dotenv').config();
 
 // Diagnóstico de arranque — confirma qué variables ve el proceso
 console.log('=== VARIABLES DE ENTORNO ===');
