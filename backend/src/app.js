@@ -45,5 +45,10 @@ app.use((err, req, res, _next) => {
   res.status(500).json({ error: 'Error interno del servidor' });
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`LABOCLYPSA API corriendo en puerto ${PORT}`));
+// Solo inicia el servidor cuando se ejecuta directamente (desarrollo local)
+if (require.main === module) {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => console.log(`LABOCLYPSA API corriendo en puerto ${PORT}`));
+}
+
+module.exports = app;
