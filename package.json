@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "scripts": {
     "start": "node backend/src/app.js",
-    "build": "cd backend && npm install"
+    "build": "npm install --prefix backend"
   },
   "engines": {
-    "node": "20"
+    "node": ">=20"
   }
 }
