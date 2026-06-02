@@ -107,7 +107,7 @@
       const body = await res.json();
 
       if (!res.ok) {
-        errorBox.textContent = body.error || 'Error al iniciar sesión';
+        errorBox.textContent = (body.error || 'Error') + (body.details ? ': ' + body.details : '');
         errorBox.classList.add('show');
         return;
       }
