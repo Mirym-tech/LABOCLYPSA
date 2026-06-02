@@ -1,14 +1,16 @@
 const { createClient } = require('@supabase/supabase-js');
 
-if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY) {
-  console.error('⚠️  FALTAN VARIABLES: SUPABASE_URL o SUPABASE_SERVICE_KEY no están configuradas');
+const url = process.env.SUPABASE_URL || '';
+const key = process.env.SUPABASE_SERVICE_KEY || '';
+
+if (!url || !key) {
+  console.error('⚠️  SUPABASE_URL o SUPABASE_SERVICE_KEY no están configuradas');
 }
 
-// Service role key — acceso completo, omite RLS.
-// Solo se usa en el servidor, nunca en el cliente.
+// Usa placeholders si las vars faltan para que el proceso no se caiga en el arrange
 const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_KEY,
+  url || 'https://placeholder.supabase.co',
+  key || 'placeholder-key',
   { auth: { autoRefreshToken: false, persistSession: false } }
 );
 
