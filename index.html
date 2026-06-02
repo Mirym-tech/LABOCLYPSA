@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LabSystem — Sistema de Laboratorio Clínico</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#f4f3ef;--surface:#fff;--surface2:#f9f8f5;--border:#e2e0d8;--border2:#ccc9be;
+    --text:#1a1916;--text2:#6b6860;--text3:#9e9b92;
+    --accent:#1a5c3a;--accent-light:#e8f2ec;--accent-mid:#2d8a58;
+    --blue:#1a4a7a;--blue-light:#e8f0f8;
+    --amber:#7a4a10;--amber-light:#fdf3e3;
+    --red:#7a1a1a;--red-light:#fde8e8;
+    --purple:#4a1a7a;--purple-light:#f0e8fd;
+    --radius:8px;--radius-lg:12px;
+    --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;min-height:100vh;}
+  .app{display:flex;min-height:100vh;}
+  .sidebar{width:220px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:0;height:100vh;}
+  .sidebar-logo{padding:20px 20px 16px;border-bottom:1px solid var(--border);}
+  .sidebar-logo .lab-name{font-size:15px;font-weight:600;color:var(--text);letter-spacing:-0.3px;}
+  .sidebar-logo .lab-sub{font-size:11px;color:var(--text3);margin-top:2px;}
+  .sidebar-nav{flex:1;padding:12px 10px;overflow-y:auto;}
+  .nav-section-label{font-size:10px;font-weight:500;color:var(--text3);letter-spacing:0.8px;text-transform:uppercase;padding:8px 10px 4px;}
+  .nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:var(--radius);cursor:pointer;color:var(--text2);font-size:13.5px;font-weight:400;transition:all 0.15s;text-decoration:none;margin-bottom:1px;}
+  .nav-item:hover{background:var(--bg);color:var(--text);}
+  .nav-item.active{background:var(--accent-light);color:var(--accent);font-weight:500;}
+  .nav-item svg{width:16px;height:16px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+  .nav-badge{margin-left:auto;background:var(--accent);color:#fff;font-size:10px;font-weight:600;padding:1px 6px;border-radius:20px;font-family:var(--mono);}
+  .sidebar-footer{padding:12px 10px;border-top:1px solid var(--border);}
+  .user-pill{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:var(--radius);}
+  .avatar{width:28px;height:28px;border-radius:50%;background:var(--accent-light);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0;}
+  .user-info .user-name{font-size:13px;font-weight:500;}
+  .user-info .user-role{font-size:11px;color:var(--text3);}
+  .main{flex:1;display:flex;flex-direction:column;min-width:0;}
+  .topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:52px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:10;}
+  .topbar-title{font-size:15px;font-weight:500;flex:1;}
+  .topbar-actions{display:flex;gap:8px;align-items:center;}
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:var(--radius);font-family:var(--font);font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--border2);background:var(--surface);color:var(--text);transition:all 0.15s;white-space:nowrap;}
+  .btn:hover{background:var(--bg);}
+  .btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .btn-primary{background:var(--accent);color:#fff;border-color:var(--accent);}
+  .btn-primary:hover{background:var(--accent-mid);border-color:var(--accent-mid);}
+  .btn-danger{background:var(--red-light);color:var(--red);border-color:#f5c6c6;}
+  .btn-danger:hover{background:#fbd5d5;}
+  .btn-sm{padding:5px 10px;font-size:12px;}
+  .content{padding:24px;flex:1;}
+  .page{display:none;}
+  .page.active{display:block;}
+  .stats-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:24px;}
+  .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px;}
+  .stat-label{font-size:11px;color:var(--text3);font-weight:500;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;}
+  .stat-value{font-size:26px;font-weight:600;letter-spacing:-1px;font-family:var(--mono);}
+  .stat-sub{font-size:11px;color:var(--text3);margin-top:4px;}
+  .stat-card.green .stat-value{color:var(--accent);}
+  .stat-card.blue .stat-value{color:var(--blue);}
+  .stat-card.amber .stat-value{color:var(--amber);}
+  .stat-card.purple .stat-value{color:var(--purple);}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:20px;}
+  .card-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;}
+  .card-title{font-size:13.5px;font-weight:500;flex:1;}
+  .table-wrap{overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  thead tr{background:var(--surface2);}
+  th{padding:10px 16px;text-align:left;font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text3);border-bottom:1px solid var(--border);white-space:nowrap;}
+  td{padding:11px 16px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle;}
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr:hover{background:var(--surface2);}
+  .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:500;white-space:nowrap;}
+  .badge-green{background:var(--accent-light);color:var(--accent);}
+  .badge-blue{background:var(--blue-light);color:var(--blue);}
+  .badge-amber{background:var(--amber-light);color:var(--amber);}
+  .badge-red{background:var(--red-light);color:var(--red);}
+  .badge-purple{background:var(--purple-light);color:var(--purple);}
+  .badge-gray{background:var(--bg);color:var(--text2);border:1px solid var(--border);}
+  .search-bar{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:0 12px;height:34px;min-width:200px;}
+  .search-bar svg{width:14px;height:14px;stroke:var(--text3);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+  .search-bar input{border:none;background:transparent;font-family:var(--font);font-size:13px;color:var(--text);outline:none;width:100%;}
+  .search-bar input::placeholder{color:var(--text3);}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:20px 20px 0;}
+  .form-group{display:flex;flex-direction:column;gap:5px;}
+  .form-group.span2{grid-column:span 2;}
+  label{font-size:12px;font-weight:500;color:var(--text2);}
+  input[type=text],input[type=date],input[type=email],input[type=tel],input[type=number],input[type=password],select,textarea{font-family:var(--font);font-size:13px;color:var(--text);background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:7px 10px;outline:none;transition:border-color 0.15s;width:100%;}
+  input:focus,select:focus,textarea:focus{border-color:var(--accent);}
+  textarea{resize:vertical;min-height:70px;}
+  .form-actions{padding:16px 20px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid var(--border);margin-top:16px;}
+  .analisis-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:16px 20px;}
+  .analisis-item{display:flex;align-items:center;gap:8px;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:all 0.15s;background:var(--surface);}
+  .analisis-item:hover{border-color:var(--accent);}
+  .analisis-item.selected{border-color:var(--accent);background:var(--accent-light);}
+  .analisis-item input{accent-color:var(--accent);width:14px;height:14px;}
+  .analisis-item span{font-size:13px;}
+  .analisis-item.selected span{color:var(--accent);font-weight:500;}
+  .resultado-campo{display:flex;align-items:center;padding:10px 16px;border-bottom:1px solid var(--border);gap:12px;}
+  .resultado-campo:last-child{border-bottom:none;}
+  .rc-nombre{flex:1;font-size:13px;}
+  .rc-rango{font-size:11px;color:var(--text3);width:130px;text-align:right;}
+  .rc-input{width:90px;}
+  .rc-unidad{font-size:12px;color:var(--text3);width:60px;}
+  .rc-estado{width:80px;text-align:center;}
+  .audit-row{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);align-items:flex-start;}
+  .audit-row:last-child{border-bottom:none;}
+  .audit-dot{width:8px;height:8px;border-radius:50%;margin-top:4px;flex-shrink:0;}
+  .audit-dot.green{background:var(--accent-mid);}
+  .audit-dot.blue{background:#378add;}
+  .audit-dot.amber{background:#ba7517;}
+  .audit-dot.red{background:#e24b4a;}
+  .audit-text{font-size:13px;flex:1;}
+  .audit-text strong{font-weight:500;}
+  .audit-meta{font-size:11px;color:var(--text3);margin-top:2px;}
+  .audit-time{font-size:11px;color:var(--text3);white-space:nowrap;font-family:var(--mono);}
+  .lab-switcher{display:flex;gap:4px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:3px;}
+  .lab-btn{padding:4px 12px;border-radius:5px;font-size:12px;font-weight:500;cursor:pointer;border:none;background:transparent;color:var(--text2);font-family:var(--font);transition:all 0.15s;}
+  .lab-btn.active{background:var(--surface);color:var(--text);border:1px solid var(--border);}
+  .empty-state{padding:40px;text-align:center;color:var(--text3);font-size:13px;}
+  .loading{padding:30px;text-align:center;color:var(--text3);font-size:13px;}
+  .role-hidden{display:none !important;}
+  @keyframes slideIn{from{transform:translateX(20px);opacity:0}to{transform:translateX(0);opacity:1}}
+</style>
+</head>
+<body>
+<div class="app">
+
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="lab-name">LabSystem</div>
+    <div class="lab-sub">Sistema de laboratorio clínico</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Principal</div>
+    <a class="nav-item active" onclick="showPage('dashboard')">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Panel principal
+    </a>
+    <div class="nav-section-label">Módulos</div>
+    <a class="nav-item" onclick="showPage('pacientes')">
+      <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Pacientes
+    </a>
+    <a class="nav-item" onclick="showPage('ordenes')">
+      <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="12" y2="16"/></svg>
+      Órdenes de análisis
+      <span class="nav-badge" id="badge-ordenes" style="display:none">0</span>
+    </a>
+    <a class="nav-item" onclick="showPage('resultados')">
+      <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Resultados
+      <span class="nav-badge" id="badge-resultados" style="background:var(--amber);display:none">0</span>
+    </a>
+    <a class="nav-item" onclick="showPage('impresion')">
+      <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      Impresión / PDF
+    </a>
+    <div class="nav-section-label">Administración</div>
+    <a class="nav-item admin-only" onclick="showPage('usuarios')">
+      <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Usuarios
+    </a>
+    <a class="nav-item admin-only" onclick="showPage('auditoria')">
+      <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      Auditoría
+    </a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-pill">
+      <div class="avatar" id="user-avatar">--</div>
+      <div class="user-info">
+        <div class="user-name" id="user-name">Cargando...</div>
+        <div class="user-role" id="user-role"></div>
+      </div>
+    </div>
+    <button class="btn btn-sm" style="width:100%;margin-top:8px;justify-content:center;color:var(--text3)" id="btn-logout">
+      <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Cerrar sesión
+    </button>
+  </div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <span class="topbar-title" id="page-title">Panel principal</span>
+    <div class="topbar-actions">
+      <div class="lab-switcher" id="lab-switcher">
+        <button class="lab-btn active" data-lab="">Todos los labs</button>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="showPage('pacientes')">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Nuevo paciente
+      </button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card green"><div class="stat-label">Pacientes hoy</div><div class="stat-value" id="stat-hoy">—</div><div class="stat-sub">Registrados hoy</div></div>
+        <div class="stat-card blue"><div class="stat-label">Órdenes pendientes</div><div class="stat-value" id="stat-pendientes">—</div><div class="stat-sub">Sin resultados</div></div>
+        <div class="stat-card amber"><div class="stat-label">Por validar</div><div class="stat-value" id="stat-validar">—</div><div class="stat-sub">Requieren bioanalista</div></div>
+        <div class="stat-card purple"><div class="stat-label">Total este mes</div><div class="stat-value" id="stat-mes">—</div><div class="stat-sub">Ambos laboratorios</div></div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Últimas órdenes del día</span>
+          <button class="btn btn-sm" onclick="showPage('ordenes')">Ver todas</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Paciente</th><th>Análisis</th><th>Laboratorio</th><th>Hora</th><th>Estado</th></tr></thead>
+            <tbody id="tabla-dashboard"><tr><td colspan="5" class="loading">Cargando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- PACIENTES -->
+    <div class="page" id="page-pacientes">
+      <div class="card">
+        <div class="card-header"><span class="card-title">Registrar paciente</span></div>
+        <form id="form-paciente">
+          <div class="form-grid">
+            <div class="form-group"><label>Nombres *</label><input type="text" id="p-nombres" placeholder="Ej: María Elena" required></div>
+            <div class="form-group"><label>Apellidos *</label><input type="text" id="p-apellidos" placeholder="Ej: Torres Díaz" required></div>
+            <div class="form-group"><label>Cédula / Documento *</label><input type="text" id="p-cedula" placeholder="000-0000000-0" required></div>
+            <div class="form-group"><label>Fecha de nacimiento</label><input type="date" id="p-nacimiento"></div>
+            <div class="form-group"><label>Teléfono</label><input type="tel" id="p-telefono" placeholder="809-000-0000"></div>
+            <div class="form-group"><label>Correo electrónico</label><input type="email" id="p-email" placeholder="correo@ejemplo.com"></div>
+            <div class="form-group span2"><label>Dirección</label><input type="text" id="p-direccion" placeholder="Calle, sector, municipio"></div>
+            <div class="form-group"><label>Sexo</label><select id="p-sexo"><option value="">Seleccionar...</option><option value="M">Masculino</option><option value="F">Femenino</option></select></div>
+            <div class="form-group"><label>Médico referidor</label><input type="text" id="p-medico" placeholder="Nombre del médico"></div>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn" onclick="resetFormPaciente()">Cancelar</button>
+            <button type="submit" class="btn btn-primary" id="btn-guardar-paciente">Guardar paciente</button>
+          </div>
+        </form>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Buscar paciente</span>
+          <div class="search-bar" style="margin-left:auto;min-width:260px">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="buscar-paciente" placeholder="Nombre, cédula o código...">
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Código</th><th>Nombre</th><th>Cédula</th><th>Teléfono</th><th>Lab origen</th><th>Acciones</th></tr></thead>
+            <tbody id="tabla-pacientes"><tr><td colspan="6" class="loading">Buscando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ÓRDENES -->
+    <div class="page" id="page-ordenes">
+      <div class="card">
+        <div class="card-header"><span class="card-title">Nueva orden de análisis</span></div>
+        <form id="form-orden">
+          <div class="form-grid">
+            <div class="form-group"><label>Paciente *</label>
+              <select id="o-paciente" required><option value="">Seleccionar paciente...</option></select>
+            </div>
+            <div class="form-group"><label>Fecha de la orden</label><input type="date" id="o-fecha"></div>
+            <div class="form-group"><label>Médico solicitante</label><input type="text" id="o-medico" placeholder="Dr. Nombre Apellido"></div>
+            <div class="form-group"><label>Prioridad</label>
+              <select id="o-prioridad"><option value="normal">Normal</option><option value="urgente">Urgente</option></select>
+            </div>
+          </div>
+          <div style="padding:12px 20px 4px"><label style="font-size:12px;font-weight:500;color:var(--text2)">Análisis solicitados *</label></div>
+          <div class="analisis-grid" id="grid-analisis"><div class="loading">Cargando catálogo...</div></div>
+          <div class="form-actions">
+            <button type="button" class="btn" onclick="resetFormOrden()">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Crear orden</button>
+          </div>
+        </form>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Órdenes activas</span>
+          <div style="display:flex;gap:8px;margin-left:auto;align-items:center">
+            <select id="filtro-estado-orden" style="font-family:var(--font);font-size:12px;border:1px solid var(--border2);border-radius:var(--radius);padding:4px 8px;background:var(--surface)">
+              <option value="">Todos los estados</option>
+              <option value="pendiente">Pendiente</option>
+              <option value="en_proceso">En proceso</option>
+              <option value="por_validar">Por validar</option>
+              <option value="validado">Validado</option>
+            </select>
+            <div class="search-bar" style="min-width:160px">
+              <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" id="buscar-orden" placeholder="Buscar...">
+            </div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>N° Orden</th><th>Paciente</th><th>Análisis</th><th>Lab</th><th>Fecha</th><th>Estado</th><th></th></tr></thead>
+            <tbody id="tabla-ordenes"><tr><td colspan="7" class="loading">Cargando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESULTADOS -->
+    <div class="page" id="page-resultados">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title" id="resultado-titulo">Selecciona una orden para ingresar resultados</span>
+          <span id="resultado-estado" style="margin-left:auto"></span>
+        </div>
+        <div id="resultado-info" style="padding:12px 20px;border-bottom:1px solid var(--border);display:flex;gap:24px;font-size:13px;display:none">
+          <span><span style="color:var(--text3)">Paciente:</span> <strong id="res-paciente"></strong></span>
+          <span><span style="color:var(--text3)">Orden:</span> <strong id="res-orden" style="font-family:var(--mono)"></strong></span>
+          <span><span style="color:var(--text3)">Fecha:</span> <strong id="res-fecha"></strong></span>
+        </div>
+        <div id="resultado-campos"></div>
+        <div id="resultado-obs" style="padding:12px 16px;border-top:1px solid var(--border);display:none">
+          <label style="font-size:12px;font-weight:500;color:var(--text2);display:block;margin-bottom:6px">Observaciones del bioanalista</label>
+          <textarea id="res-observaciones" placeholder="Notas adicionales, hallazgos relevantes..." style="width:100%"></textarea>
+        </div>
+        <div id="resultado-actions" class="form-actions" style="display:none">
+          <button class="btn" id="btn-borrador">Guardar borrador</button>
+          <button class="btn btn-primary" id="btn-validar">Validar y finalizar</button>
+        </div>
+        <div class="empty-state" id="resultado-empty">
+          Selecciona una orden desde el módulo de Órdenes para ingresar resultados.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Órdenes por completar</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>N° Orden</th><th>Paciente</th><th>Análisis pendientes</th><th>Lab</th><th>Estado</th><th></th></tr></thead>
+            <tbody id="tabla-res-ordenes"><tr><td colspan="6" class="loading">Cargando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- IMPRESIÓN -->
+    <div class="page" id="page-impresion">
+      <div class="card">
+        <div class="card-header"><span class="card-title">Generar reporte / PDF</span></div>
+        <div style="padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div class="form-group"><label>Buscar paciente</label><input type="text" id="imp-buscar" placeholder="Nombre o cédula..."></div>
+          <div class="form-group"><label>Filtrar por fecha</label><input type="date" id="imp-fecha"></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Orden</th><th>Paciente</th><th>Análisis</th><th>Fecha</th><th>Estado</th><th>Acciones</th></tr></thead>
+            <tbody id="tabla-impresion"><tr><td colspan="6" class="loading">Cargando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- USUARIOS -->
+    <div class="page admin-only" id="page-usuarios">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Usuarios del sistema</span>
+          <button class="btn btn-primary btn-sm" style="margin-left:auto" id="btn-nuevo-usuario">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Agregar usuario
+          </button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Usuario</th><th>Rol</th><th>Laboratorio</th><th>Estado</th><th></th></tr></thead>
+            <tbody id="tabla-usuarios"><tr><td colspan="5" class="loading">Cargando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card" id="card-form-usuario">
+        <div class="card-header"><span class="card-title" id="titulo-form-usuario">Agregar usuario</span></div>
+        <form id="form-usuario">
+          <div class="form-grid">
+            <div class="form-group"><label>Nombre completo</label><input type="text" id="u-nombre" placeholder="Nombre Apellido" required></div>
+            <div class="form-group"><label>Correo electrónico</label><input type="email" id="u-email" placeholder="correo@lab.com" required></div>
+            <div class="form-group"><label>Contraseña</label><input type="password" id="u-password" placeholder="Mínimo 8 caracteres"></div>
+            <div class="form-group"><label>Confirmar contraseña</label><input type="password" id="u-password2" placeholder="Repetir contraseña"></div>
+            <div class="form-group"><label>Rol</label>
+              <select id="u-rol" required>
+                <option value="">Seleccionar...</option>
+                <option value="admin">Administrador</option>
+                <option value="bioanalista">Bioanalista</option>
+                <option value="recepcionista">Recepcionista</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Laboratorio</label>
+              <select id="u-lab"><option value="">Ambos laboratorios</option></select>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn" onclick="resetFormUsuario()">Cancelar</button>
+            <button type="submit" class="btn btn-primary" id="btn-guardar-usuario">Guardar usuario</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- AUDITORÍA -->
+    <div class="page admin-only" id="page-auditoria">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Registro de auditoría</span>
+          <div style="display:flex;gap:8px;margin-left:auto">
+            <input type="date" id="audit-fecha" style="font-family:var(--font);font-size:13px;border:1px solid var(--border2);border-radius:var(--radius);padding:5px 10px;background:var(--surface)">
+            <select id="audit-accion" style="font-family:var(--font);font-size:13px;border:1px solid var(--border2);border-radius:var(--radius);padding:5px 10px;background:var(--surface)">
+              <option value="">Todos los eventos</option>
+              <option value="login">Login</option>
+              <option value="crear_paciente">Crear paciente</option>
+              <option value="editar_paciente">Editar paciente</option>
+              <option value="crear_orden">Crear orden</option>
+              <option value="ingresar_resultados">Ingresar resultados</option>
+              <option value="validar_resultado">Validar resultado</option>
+              <option value="crear_usuario">Crear usuario</option>
+            </select>
+          </div>
+        </div>
+        <div style="padding:8px 20px" id="lista-auditoria">
+          <div class="loading">Cargando...</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script>
+// ============================================================
+// Estado global
+// ============================================================
+let currentUser = null;
+let ordenActivaId = null;   // orden seleccionada para ingresar resultados
+let editandoPacienteId = null;
+let editandoUsuarioId = null;
+
+const pageTitles = {
+  dashboard: 'Panel principal', pacientes: 'Pacientes',
+  ordenes: 'Órdenes de análisis', resultados: 'Resultados',
+  impresion: 'Impresión / PDF', usuarios: 'Usuarios del sistema',
+  auditoria: 'Auditoría',
+};
+
+// ============================================================
+// INICIALIZACIÓN
+// ============================================================
+async function init() {
+  const token = localStorage.getItem('lab_token');
+  if (!token) { window.location.href = 'login.html'; return; }
+
+  try {
+    currentUser = await api.auth.me();
+    renderUserInfo();
+    applyRoleVisibility();
+    await Promise.all([loadLaboratorios(), loadDashboard()]);
+  } catch {
+    localStorage.removeItem('lab_token');
+    localStorage.removeItem('lab_user');
+    window.location.href = 'login.html';
+  }
+}
+
+function renderUserInfo() {
+  const initials = currentUser.nombre_completo.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase();
+  document.getElementById('user-avatar').textContent = initials;
+  document.getElementById('user-name').textContent = currentUser.nombre_completo;
+  const rolLabel = { admin: 'Administrador', bioanalista: 'Bioanalista', recepcionista: 'Recepcionista' };
+  document.getElementById('user-role').textContent = rolLabel[currentUser.rol] || currentUser.rol;
+}
+
+function applyRoleVisibility() {
+  if (currentUser.rol !== 'admin') {
+    document.querySelectorAll('.admin-only').forEach(el => el.classList.add('role-hidden'));
+  }
+}
+
+async function loadLaboratorios() {
+  const labs = await api.catalogo.laboratorios();
+  const switcher = document.getElementById('lab-switcher');
+  switcher.innerHTML = '<button class="lab-btn active" data-lab="">Todos</button>';
+  labs.forEach(lab => {
+    const btn = document.createElement('button');
+    btn.className = 'lab-btn';
+    btn.dataset.lab = lab.id;
+    btn.textContent = lab.nombre.replace(' — ', ' ');
+    switcher.appendChild(btn);
+  });
+  switcher.addEventListener('click', e => {
+    if (!e.target.classList.contains('lab-btn')) return;
+    document.querySelectorAll('.lab-btn').forEach(b => b.classList.remove('active'));
+    e.target.classList.add('active');
+  });
+
+  // Poblar select de laboratorio en formulario usuario
+  const selLab = document.getElementById('u-lab');
+  if (selLab) {
+    labs.forEach(lab => {
+      const opt = document.createElement('option');
+      opt.value = lab.id;
+      opt.textContent = lab.nombre;
+      selLab.appendChild(opt);
+    });
+  }
+}
+
+// ============================================================
+// NAVEGACIÓN
+// ============================================================
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const page = document.getElementById('page-' + name);
+  if (!page) return;
+  page.classList.add('active');
+  document.getElementById('page-title').textContent = pageTitles[name] || name;
+  document.querySelectorAll('.nav-item').forEach(item => {
+    if (item.getAttribute('onclick')?.includes(`'${name}'`)) item.classList.add('active');
+  });
+
+  const loaders = {
+    dashboard: loadDashboard,
+    pacientes: loadPacientes,
+    ordenes: loadOrdenes,
+    resultados: loadOrdenesResultados,
+    impresion: loadImpresion,
+    usuarios: loadUsuarios,
+    auditoria: loadAuditoria,
+  };
+  if (loaders[name]) loaders[name]();
+}
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+async function loadDashboard() {
+  try {
+    const [hoy, pendientes, validar, mes] = await Promise.all([
+      api.ordenes.listar({ estado: 'pendiente', limit: 100 }),
+      api.ordenes.listar({ estado: 'pendiente', limit: 5 }),
+      api.ordenes.listar({ estado: 'por_validar', limit: 100 }),
+      api.ordenes.listar({ limit: 100 }),
+    ]);
+
+    document.getElementById('stat-hoy').textContent = String(hoy.total || 0).padStart(2, '0');
+    document.getElementById('stat-pendientes').textContent = String(pendientes.total || 0).padStart(2, '0');
+    document.getElementById('stat-validar').textContent = String(validar.total || 0).padStart(2, '0');
+    document.getElementById('stat-mes').textContent = mes.total || 0;
+
+    // Badges en nav
+    const bp = document.getElementById('badge-ordenes');
+    const bv = document.getElementById('badge-resultados');
+    if (pendientes.total > 0) { bp.textContent = pendientes.total; bp.style.display = ''; }
+    if (validar.total > 0) { bv.textContent = validar.total; bv.style.display = ''; }
+
+    const ultimas = await api.ordenes.listar({ limit: 8 });
+    const tbody = document.getElementById('tabla-dashboard');
+    if (!ultimas.data?.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Sin órdenes hoy</td></tr>'; return; }
+
+    tbody.innerHTML = ultimas.data.map(o => `
+      <tr>
+        <td>${o.pacientes?.nombres} ${o.pacientes?.apellidos}</td>
+        <td>${o.orden_analisis?.map(a => a.analisis_tipos?.nombre).join(', ') || '—'}</td>
+        <td><span class="badge badge-green">${o.laboratorios?.nombre || '—'}</span></td>
+        <td style="font-family:var(--mono);font-size:12px">${formatHora(o.created_at)}</td>
+        <td>${estadoBadge(o.estado)}</td>
+      </tr>`).join('');
+  } catch (e) {
+    console.error('Dashboard:', e);
+  }
+}
+
+// ============================================================
+// PACIENTES
+// ============================================================
+async function loadPacientes(q = '') {
+  const tbody = document.getElementById('tabla-pacientes');
+  tbody.innerHTML = '<tr><td colspan="6" class="loading">Buscando...</td></tr>';
+  try {
+    const res = await api.pacientes.listar(q);
+    if (!res.data?.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No se encontraron pacientes</td></tr>'; return; }
+    tbody.innerHTML = res.data.map(p => `
+      <tr>
+        <td><span style="font-family:var(--mono);font-size:12px;color:var(--text3)">${p.codigo}</span></td>
+        <td>${p.nombres} ${p.apellidos}</td>
+        <td>${p.cedula}</td>
+        <td>${p.telefono || '—'}</td>
+        <td><span class="badge badge-green">${p.laboratorios?.nombre || '—'}</span></td>
+        <td style="display:flex;gap:6px">
+          <button class="btn btn-sm" onclick="editarPaciente('${p.id}')">Editar</button>
+          <button class="btn btn-sm btn-primary" onclick="crearOrdenDesde('${p.id}','${p.nombres} ${p.apellidos}')">Nueva orden</button>
+        </td>
+      </tr>`).join('');
+  } catch (e) { tbody.innerHTML = `<tr><td colspan="6" class="empty-state">${e.message}</td></tr>`; }
+}
+
+document.getElementById('buscar-paciente').addEventListener('input', e => {
+  clearTimeout(window._searchTimer);
+  window._searchTimer = setTimeout(() => loadPacientes(e.target.value), 350);
+});
+
+document.getElementById('form-paciente').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('btn-guardar-paciente');
+  btn.disabled = true;
+  try {
+    const body = {
+      nombres: document.getElementById('p-nombres').value,
+      apellidos: document.getElementById('p-apellidos').value,
+      cedula: document.getElementById('p-cedula').value,
+      fecha_nacimiento: document.getElementById('p-nacimiento').value || null,
+      sexo: document.getElementById('p-sexo').value || null,
+      telefono: document.getElementById('p-telefono').value || null,
+      email: document.getElementById('p-email').value || null,
+      direccion: document.getElementById('p-direccion').value || null,
+      medico_referidor: document.getElementById('p-medico').value || null,
+    };
+    if (editandoPacienteId) {
+      await api.pacientes.editar(editandoPacienteId, body);
+      showToast('Paciente actualizado correctamente');
+    } else {
+      await api.pacientes.crear(body);
+      showToast('Paciente registrado correctamente');
+    }
+    resetFormPaciente();
+    loadPacientes();
+  } catch (err) {
+    showToast(err.message, 'error');
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+async function editarPaciente(id) {
+  const { paciente } = await api.pacientes.obtener(id);
+  editandoPacienteId = id;
+  document.getElementById('p-nombres').value = paciente.nombres;
+  document.getElementById('p-apellidos').value = paciente.apellidos;
+  document.getElementById('p-cedula').value = paciente.cedula;
+  document.getElementById('p-nacimiento').value = paciente.fecha_nacimiento || '';
+  document.getElementById('p-sexo').value = paciente.sexo || '';
+  document.getElementById('p-telefono').value = paciente.telefono || '';
+  document.getElementById('p-email').value = paciente.email || '';
+  document.getElementById('p-direccion').value = paciente.direccion || '';
+  document.getElementById('p-medico').value = paciente.medico_referidor || '';
+  document.getElementById('btn-guardar-paciente').textContent = 'Actualizar paciente';
+  window.scrollTo(0, 0);
+}
+
+function resetFormPaciente() {
+  editandoPacienteId = null;
+  document.getElementById('form-paciente').reset();
+  document.getElementById('btn-guardar-paciente').textContent = 'Guardar paciente';
+}
+
+// ============================================================
+// ÓRDENES
+// ============================================================
+async function loadOrdenes() {
+  // Cargar lista de pacientes para el select
+  const pacRes = await api.pacientes.listar('', 1);
+  const sel = document.getElementById('o-paciente');
+  sel.innerHTML = '<option value="">Seleccionar paciente...</option>';
+  pacRes.data?.forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p.id;
+    opt.textContent = `${p.nombres} ${p.apellidos} — ${p.codigo}`;
+    sel.appendChild(opt);
+  });
+
+  // Cargar catálogo de análisis
+  const analisis = await api.catalogo.analisis();
+  const grid = document.getElementById('grid-analisis');
+  grid.innerHTML = analisis.map(a => `
+    <div class="analisis-item" onclick="toggleAnalisis(this)" data-id="${a.id}">
+      <input type="checkbox"><span>${a.nombre}</span>
+    </div>`).join('');
+
+  loadTablaOrdenes();
+}
+
+async function loadTablaOrdenes() {
+  const tbody = document.getElementById('tabla-ordenes');
+  tbody.innerHTML = '<tr><td colspan="7" class="loading">Cargando...</td></tr>';
+  const estado = document.getElementById('filtro-estado-orden').value;
+  try {
+    const res = await api.ordenes.listar(estado ? { estado } : {});
+    if (!res.data?.length) { tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No hay órdenes</td></tr>'; return; }
+    tbody.innerHTML = res.data.map(o => {
+      const analisisNombres = o.orden_analisis?.map(a => a.analisis_tipos?.nombre).join(', ') || '—';
+      return `
+        <tr>
+          <td><span style="font-family:var(--mono);font-size:12px">${o.numero}</span></td>
+          <td>${o.pacientes?.nombres} ${o.pacientes?.apellidos}</td>
+          <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${analisisNombres}</td>
+          <td><span class="badge badge-green">${o.laboratorios?.nombre || '—'}</span></td>
+          <td>${formatFecha(o.created_at)}</td>
+          <td>${estadoBadge(o.estado)}</td>
+          <td><button class="btn btn-sm btn-primary" onclick="abrirResultados('${o.id}')">Resultados</button></td>
+        </tr>`;
+    }).join('');
+  } catch (e) { tbody.innerHTML = `<tr><td colspan="7" class="empty-state">${e.message}</td></tr>`; }
+}
+
+document.getElementById('filtro-estado-orden').addEventListener('change', loadTablaOrdenes);
+
+document.getElementById('form-orden').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const seleccionados = [...document.querySelectorAll('#grid-analisis .analisis-item.selected')].map(el => el.dataset.id);
+  if (!seleccionados.length) { showToast('Selecciona al menos un análisis', 'error'); return; }
+  try {
+    await api.ordenes.crear({
+      paciente_id: document.getElementById('o-paciente').value,
+      analisis_tipos_ids: seleccionados,
+      medico_solicitante: document.getElementById('o-medico').value || null,
+      prioridad: document.getElementById('o-prioridad').value,
+    });
+    showToast('Orden creada correctamente');
+    resetFormOrden();
+    loadTablaOrdenes();
+  } catch (err) { showToast(err.message, 'error'); }
+});
+
+function resetFormOrden() {
+  document.getElementById('form-orden').reset();
+  document.querySelectorAll('#grid-analisis .analisis-item').forEach(el => {
+    el.classList.remove('selected');
+    el.querySelector('input').checked = false;
+  });
+}
+
+function crearOrdenDesde(pacienteId, nombre) {
+  showPage('ordenes');
+  setTimeout(() => {
+    const sel = document.getElementById('o-paciente');
+    sel.value = pacienteId;
+  }, 300);
+}
+
+function toggleAnalisis(el) {
+  el.classList.toggle('selected');
+  el.querySelector('input[type=checkbox]').checked = el.classList.contains('selected');
+}
+
+// ============================================================
+// RESULTADOS
+// ============================================================
+async function loadOrdenesResultados() {
+  const tbody = document.getElementById('tabla-res-ordenes');
+  tbody.innerHTML = '<tr><td colspan="6" class="loading">Cargando...</td></tr>';
+  try {
+    const res = await api.ordenes.listar({ estado: 'pendiente' });
+    const res2 = await api.ordenes.listar({ estado: 'en_proceso' });
+    const todas = [...(res.data || []), ...(res2.data || [])];
+
+    if (!todas.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No hay órdenes pendientes</td></tr>'; return; }
+    tbody.innerHTML = todas.map(o => {
+      const pendientes = o.orden_analisis?.filter(a => !a.validado_at).length || 0;
+      return `
+        <tr>
+          <td><span style="font-family:var(--mono);font-size:12px">${o.numero}</span></td>
+          <td>${o.pacientes?.nombres} ${o.pacientes?.apellidos}</td>
+          <td>${pendientes} análisis pendiente(s)</td>
+          <td><span class="badge badge-green">${o.laboratorios?.nombre || '—'}</span></td>
+          <td>${estadoBadge(o.estado)}</td>
+          <td><button class="btn btn-sm btn-primary" onclick="abrirResultados('${o.id}')">Ingresar</button></td>
+        </tr>`;
+    }).join('');
+  } catch (e) { tbody.innerHTML = `<tr><td colspan="6" class="empty-state">${e.message}</td></tr>`; }
+}
+
+async function abrirResultados(ordenId) {
+  showPage('resultados');
+  ordenActivaId = ordenId;
+
+  const orden = await api.ordenes.obtener(ordenId);
+
+  document.getElementById('resultado-titulo').textContent = `Resultados — ${orden.orden_analisis?.[0]?.analisis_tipos?.nombre || 'Análisis'}`;
+  document.getElementById('resultado-estado').innerHTML = estadoBadge(orden.estado);
+  document.getElementById('res-paciente').textContent = `${orden.pacientes?.nombres} ${orden.pacientes?.apellidos}`;
+  document.getElementById('res-orden').textContent = orden.numero;
+  document.getElementById('res-fecha').textContent = formatFecha(orden.created_at);
+  document.getElementById('resultado-info').style.display = 'flex';
+  document.getElementById('resultado-obs').style.display = '';
+  document.getElementById('resultado-actions').style.display = 'flex';
+  document.getElementById('resultado-empty').style.display = 'none';
+
+  // Construir campos de todos los análisis de la orden
+  const campos = document.getElementById('resultado-campos');
+  campos.innerHTML = '';
+
+  for (const oa of orden.orden_analisis) {
+    const tipos = oa.analisis_tipos;
+    const header = document.createElement('div');
+    header.style.cssText = 'padding:10px 16px 4px;background:var(--surface2);border-bottom:1px solid var(--border);font-size:12px;font-weight:500;color:var(--text2)';
+    header.textContent = tipos.nombre;
+    campos.appendChild(header);
+
+    const campos_arr = tipos.campos || [];
+    campos_arr.forEach(campo => {
+      const valorActual = oa.resultados?.[campo.nombre] || '';
+      const row = document.createElement('div');
+      row.className = 'resultado-campo';
+      row.dataset.oaId = oa.id;
+      row.dataset.campo = campo.nombre;
+      row.innerHTML = `
+        <span class="rc-nombre">${campo.nombre}</span>
+        <input type="number" class="rc-input" value="${valorActual}" step="any" placeholder="0.0"
+               onchange="marcarCampo(this,'${campo.nombre}',${campo.rango_min},${campo.rango_max})">
+        <span class="rc-unidad">${campo.unidad || ''}</span>
+        <span class="rc-rango">${campo.rango_min != null ? `${campo.rango_min} – ${campo.rango_max}` : 'Sin rango'}</span>
+        <span class="rc-estado" id="estado-${oa.id}-${campo.nombre.replace(/\s/g,'-')}">
+          ${valorActual ? estadoValor(parseFloat(valorActual), campo.rango_min, campo.rango_max) : '<span class="badge badge-gray">—</span>'}
+        </span>`;
+      campos.appendChild(row);
+    });
+  }
+
+  // Set observaciones si existen
+  const obs = orden.orden_analisis?.[0]?.observaciones || '';
+  document.getElementById('res-observaciones').value = obs;
+}
+
+function estadoValor(val, min, max) {
+  if (min == null || max == null) return '<span class="badge badge-gray">—</span>';
+  if (val < min) return '<span class="badge badge-red">↓ Bajo</span>';
+  if (val > max) return '<span class="badge badge-amber">↑ Alto</span>';
+  return '<span class="badge badge-green">Normal</span>';
+}
+
+function marcarCampo(input, nombre, min, max) {
+  const val = parseFloat(input.value);
+  const oaId = input.closest('[data-oa-id]').dataset.oaId;
+  const key = `estado-${oaId}-${nombre.replace(/\s/g, '-')}`;
+  const el = document.getElementById(key);
+  if (el) el.innerHTML = isNaN(val) ? '<span class="badge badge-gray">—</span>' : estadoValor(val, min, max);
+}
+
+document.getElementById('btn-borrador').addEventListener('click', () => guardarResultados(false));
+document.getElementById('btn-validar').addEventListener('click', () => guardarResultados(true));
+
+async function guardarResultados(validar) {
+  if (!ordenActivaId) return;
+  try {
+    const orden = await api.ordenes.obtener(ordenActivaId);
+    for (const oa of orden.orden_analisis) {
+      const resultados = {};
+      document.querySelectorAll(`[data-oa-id="${oa.id}"]`).forEach(row => {
+        const campo = row.dataset.campo;
+        const val = row.querySelector('input')?.value;
+        if (campo && val !== '') resultados[campo] = val;
+      });
+
+      await api.resultados.guardar(oa.id, {
+        resultados,
+        observaciones: document.getElementById('res-observaciones').value,
+      });
+
+      if (validar) await api.resultados.validar(oa.id);
+    }
+    showToast(validar ? 'Resultados validados correctamente' : 'Borrador guardado');
+    loadOrdenesResultados();
+  } catch (e) { showToast(e.message, 'error'); }
+}
+
+// ============================================================
+// IMPRESIÓN
+// ============================================================
+async function loadImpresion() {
+  const tbody = document.getElementById('tabla-impresion');
+  tbody.innerHTML = '<tr><td colspan="6" class="loading">Cargando...</td></tr>';
+  try {
+    const res = await api.ordenes.listar({ estado: 'validado', limit: 30 });
+    if (!res.data?.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No hay resultados validados aún</td></tr>'; return; }
+    tbody.innerHTML = res.data.map(o => `
+      <tr>
+        <td><span style="font-family:var(--mono);font-size:12px">${o.numero}</span></td>
+        <td>${o.pacientes?.nombres} ${o.pacientes?.apellidos}</td>
+        <td>${o.orden_analisis?.map(a => a.analisis_tipos?.nombre).join(', ')}</td>
+        <td>${formatFecha(o.created_at)}</td>
+        <td>${estadoBadge(o.estado)}</td>
+        <td style="display:flex;gap:6px">
+          <button class="btn btn-sm btn-primary" onclick="generarPDF('${o.id}')">PDF</button>
+          <button class="btn btn-sm" onclick="window.print()">Imprimir</button>
+        </td>
+      </tr>`).join('');
+  } catch (e) { tbody.innerHTML = `<tr><td colspan="6" class="empty-state">${e.message}</td></tr>`; }
+}
+
+function generarPDF(ordenId) {
+  showToast('Generación de PDF — próximamente con html2pdf.js');
+}
+
+// ============================================================
+// USUARIOS
+// ============================================================
+async function loadUsuarios() {
+  const tbody = document.getElementById('tabla-usuarios');
+  tbody.innerHTML = '<tr><td colspan="5" class="loading">Cargando...</td></tr>';
+  try {
+    const data = await api.usuarios.listar();
+    if (!data?.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No hay usuarios</td></tr>'; return; }
+    tbody.innerHTML = data.map(u => {
+      const initials = u.nombre_completo.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase();
+      return `
+        <tr>
+          <td><div style="display:flex;align-items:center;gap:8px">
+            <div class="avatar">${initials}</div>
+            <div><div style="font-weight:500">${u.nombre_completo}</div></div>
+          </div></td>
+          <td>${rolBadge(u.rol)}</td>
+          <td>${u.laboratorios?.nombre || 'Ambos'}</td>
+          <td>${u.activo ? '<span class="badge badge-green">Activo</span>' : '<span class="badge badge-red">Inactivo</span>'}</td>
+          <td><button class="btn btn-sm" onclick="editarUsuario('${u.id}','${u.nombre_completo}','${u.rol}','${u.laboratorio_id||''}','${u.activo}')">Editar</button></td>
+        </tr>`;
+    }).join('');
+  } catch (e) { tbody.innerHTML = `<tr><td colspan="5" class="empty-state">${e.message}</td></tr>`; }
+}
+
+function editarUsuario(id, nombre, rol, labId, activo) {
+  editandoUsuarioId = id;
+  document.getElementById('u-nombre').value = nombre;
+  document.getElementById('u-rol').value = rol;
+  document.getElementById('u-lab').value = labId || '';
+  document.getElementById('u-password').required = false;
+  document.getElementById('u-password').placeholder = 'Dejar vacío para no cambiar';
+  document.getElementById('titulo-form-usuario').textContent = 'Editar usuario';
+  document.getElementById('btn-guardar-usuario').textContent = 'Actualizar usuario';
+}
+
+function resetFormUsuario() {
+  editandoUsuarioId = null;
+  document.getElementById('form-usuario').reset();
+  document.getElementById('u-password').required = true;
+  document.getElementById('u-password').placeholder = 'Mínimo 8 caracteres';
+  document.getElementById('titulo-form-usuario').textContent = 'Agregar usuario';
+  document.getElementById('btn-guardar-usuario').textContent = 'Guardar usuario';
+}
+
+document.getElementById('form-usuario').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const pass = document.getElementById('u-password').value;
+  const pass2 = document.getElementById('u-password2').value;
+  if (pass && pass !== pass2) { showToast('Las contraseñas no coinciden', 'error'); return; }
+
+  try {
+    if (editandoUsuarioId) {
+      await api.usuarios.editar(editandoUsuarioId, {
+        nombre_completo: document.getElementById('u-nombre').value,
+        rol: document.getElementById('u-rol').value,
+        laboratorio_id: document.getElementById('u-lab').value || null,
+      });
+      if (pass) await api.usuarios.cambiarPassword(editandoUsuarioId, pass);
+      showToast('Usuario actualizado');
+    } else {
+      await api.usuarios.crear({
+        email: document.getElementById('u-email').value,
+        password: pass,
+        nombre_completo: document.getElementById('u-nombre').value,
+        rol: document.getElementById('u-rol').value,
+        laboratorio_id: document.getElementById('u-lab').value || null,
+      });
+      showToast('Usuario creado correctamente');
+    }
+    resetFormUsuario();
+    loadUsuarios();
+  } catch (err) { showToast(err.message, 'error'); }
+});
+
+// ============================================================
+// AUDITORÍA
+// ============================================================
+async function loadAuditoria() {
+  const cont = document.getElementById('lista-auditoria');
+  cont.innerHTML = '<div class="loading">Cargando...</div>';
+  const fecha = document.getElementById('audit-fecha').value;
+  const accion = document.getElementById('audit-accion').value;
+  try {
+    const params = {};
+    if (fecha) params.fecha = fecha;
+    if (accion) params.accion = accion;
+    const res = await api.auditoria.listar(params);
+
+    if (!res.data?.length) { cont.innerHTML = '<div class="empty-state">Sin registros para los filtros seleccionados</div>'; return; }
+
+    const colores = {
+      crear_paciente: 'blue', crear_orden: 'blue',
+      validar_resultado: 'green', ingresar_resultados: 'amber',
+      login: 'green', crear_usuario: 'blue',
+      editar_paciente: 'amber', editar_usuario: 'amber',
+    };
+
+    cont.innerHTML = res.data.map(a => {
+      const color = colores[a.accion] || 'blue';
+      const label = {
+        crear_paciente: 'registró paciente', editar_paciente: 'editó paciente',
+        crear_orden: 'creó orden', ingresar_resultados: 'ingresó resultados',
+        validar_resultado: 'validó resultado', crear_usuario: 'creó usuario',
+        login: 'inició sesión', logout: 'cerró sesión',
+      }[a.accion] || a.accion;
+
+      return `
+        <div class="audit-row">
+          <div class="audit-dot ${color}"></div>
+          <div class="audit-text">
+            <strong>${a.usuario_nombre}</strong> ${label}
+            ${a.registro_id ? `— <span style="font-family:var(--mono)">${a.registro_id.substring(0, 8)}...</span>` : ''}
+            <div class="audit-meta">${a.laboratorios?.nombre || ''}</div>
+          </div>
+          <div class="audit-time">${formatHora(a.created_at)}</div>
+        </div>`;
+    }).join('');
+  } catch (e) { cont.innerHTML = `<div class="empty-state">${e.message}</div>`; }
+}
+
+document.getElementById('audit-fecha').addEventListener('change', loadAuditoria);
+document.getElementById('audit-accion').addEventListener('change', loadAuditoria);
+
+// ============================================================
+// LOGOUT
+// ============================================================
+document.getElementById('btn-logout').addEventListener('click', async () => {
+  await api.auth.logout();
+  localStorage.removeItem('lab_token');
+  localStorage.removeItem('lab_user');
+  window.location.href = 'login.html';
+});
+
+// ============================================================
+// ARRANQUE
+// ============================================================
+init();
+</script>
+</body>
+</html>
