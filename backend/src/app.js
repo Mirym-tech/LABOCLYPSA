@@ -1,7 +1,5 @@
-// En desarrollo carga el .env local; en producción Railway inyecta las vars directamente
-if (process.env.NODE_ENV !== 'production') {
-  require('dotenv').config({ path: require('path').join(__dirname, '../../.env') });
-}
+// Carga .env si existe (development). En Railway las vars vienen de Settings > Variables.
+require('dotenv').config({ path: require('path').join(__dirname, '../.env') });
 
 // Diagnóstico de arranque — confirma qué variables ve el proceso
 console.log('=== VARIABLES DE ENTORNO ===');
