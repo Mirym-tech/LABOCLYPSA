@@ -1,26 +1,21 @@
-FROM php:8.2-cli
+FROM serversideup/php:8.2-fpm-nginx
 
-RUN apt-get update && apt-get install -y \
-    git curl zip unzip libpq-dev libzip-dev libpng-dev libxml2-dev libonig-dev \
-    && docker-php-ext-install pdo pdo_pgsql pgsql mbstring xml zip gd \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+USER root
 
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+# Install PostgreSQL extension
+RUN install-php-extensions pdo_pgsql pgsql
 
-WORKDIR /app
+USER www-data
 
-COPY composer.json composer.lock ./
-RUN composer install --no-dev --optimize-autoloader --no-scripts
+COPY --chown=www-data:www-data . /var/www/html
 
-COPY . .
-
-RUN mkdir -p storage/framework/cache/data storage/framework/sessions \
-    storage/framework/views storage/logs \
+RUN composer install --no-dev --optimize-autoloader --no-scripts \
+    && mkdir -p storage/framework/cache/data storage/framework/sessions \
+       storage/framework/views storage/logs \
     && chmod -R 775 storage bootstrap/cache
 
-COPY docker-start.sh /usr/local/bin/start
+COPY --chown=www-data:www-data docker-start.sh /usr/local/bin/start
+USER root
 RUN chmod +x /usr/local/bin/start
-
-EXPOSE 8080
 
 CMD ["/usr/local/bin/start"]
