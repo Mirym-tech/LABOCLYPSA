@@ -6,4 +6,4 @@ php artisan route:cache
 php artisan view:cache
 php artisan migrate --force
 
-exec /start.sh
+exec php artisan serve --host=0.0.0.0 --port=${PORT:-8080}
