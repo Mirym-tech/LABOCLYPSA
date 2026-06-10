@@ -6,7 +6,7 @@
 <div x-data="{
     modal: false,
     selected: null,
-    seleccionar(orden) { this.selected = orden; this.modal = true; }
+    seleccionar(p) { this.selected = p; this.modal = true; }
 }">
 
 {{-- Encabezado --}}
@@ -19,7 +19,7 @@
 
 {{-- Buscador --}}
 <form method="GET" class="bg-white p-4 rounded-xl shadow-sm mb-6 flex gap-3">
-    <input type="text" name="buscar" value="{{ request('buscar') }}" placeholder="Buscar por nombre, cédula o código..."
+    <input type="text" name="buscar" value="{{ request('buscar') }}" placeholder="Buscar por nombre, cédula, código u orden..."
         class="input flex-1">
     <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700">
         <i class="fas fa-search"></i>
@@ -35,51 +35,48 @@
         <table class="w-full text-xs border-collapse">
             <thead class="sticky top-0 z-10">
                 <tr class="bg-gray-700 text-white">
-                    <th class="px-2 py-2 text-left font-semibold border-r border-gray-600 w-20">Numero</th>
-                    <th class="px-2 py-2 text-left font-semibold border-r border-gray-600 w-22">Fecha Ent.</th>
-                    <th class="px-2 py-2 text-left font-semibold border-r border-gray-600 w-14">Entrada</th>
-                    <th class="px-2 py-2 text-left font-semibold border-r border-gray-600 w-20">Tipo</th>
-                    <th class="px-2 py-2 text-left font-semibold border-r border-gray-600 w-16">Factura</th>
                     <th class="px-2 py-2 text-left font-semibold border-r border-gray-600 w-20">Código</th>
                     <th class="px-2 py-2 text-left font-semibold border-r border-gray-600">Nombre</th>
                     <th class="px-2 py-2 text-left font-semibold border-r border-gray-600 w-24">Cédula</th>
-                    <th class="px-2 py-2 text-left font-semibold border-r border-gray-600 w-18">Edad/Sexo</th>
+                    <th class="px-2 py-2 text-left font-semibold border-r border-gray-600 w-16">Edad/Sexo</th>
                     <th class="px-2 py-2 text-left font-semibold border-r border-gray-600 w-28">Médico</th>
+                    <th class="px-2 py-2 text-left font-semibold border-r border-gray-600 w-24">Seguro</th>
+                    <th class="px-2 py-2 text-left font-semibold border-r border-gray-600 w-20">Última Orden</th>
+                    <th class="px-2 py-2 text-left font-semibold border-r border-gray-600 w-22">Fecha</th>
                     <th class="px-2 py-2 text-left font-semibold border-r border-gray-600 w-24">Laboratorio</th>
                     <th class="px-2 py-2 text-left font-semibold border-r border-gray-600 w-28">Dirección</th>
                     <th class="px-2 py-2 text-left font-semibold border-r border-gray-600 w-24">Teléfono</th>
                 </tr>
             </thead>
             <tbody>
-                @forelse($ordenes as $orden)
-                <tr class="cursor-pointer border-b border-gray-100 {{ $loop->even ? 'bg-gray-50' : 'bg-white' }} hover:bg-blue-100 group"
+                @forelse($pacientes as $paciente)
+                @php $orden = $paciente->ordenes->first(); @endphp
+                <tr class="cursor-pointer border-b border-gray-100 {{ $loop->even ? 'bg-gray-50' : 'bg-white' }} hover:bg-blue-100"
                     @click="seleccionar({
-                        id: {{ $orden->id }},
-                        numero: '{{ $orden->numero_orden }}',
-                        nombre: '{{ addslashes(strtoupper($orden->paciente?->nombre ?? 'SIN PACIENTE')) }}',
-                        urlAbrir: '{{ route('ordenes.show', $orden) }}',
-                        urlEditar: '{{ $orden->paciente ? route('pacientes.edit', $orden->paciente_id) : '#' }}',
-                        urlImprimir: '{{ route('ordenes.show', $orden) }}',
-                        urlNuevaOrden: '{{ $orden->paciente ? route('ordenes.create', ['paciente_id' => $orden->paciente_id]) : '#' }}'
+                        id: {{ $paciente->id }},
+                        nombre: '{{ addslashes(strtoupper($paciente->nombre)) }}',
+                        ordenId: {{ $orden?->id ?? 'null' }},
+                        numero: '{{ $orden?->numero_orden ?? '' }}',
+                        urlAbrir: '{{ $orden ? route('ordenes.show', $orden) : '#' }}',
+                        urlEditar: '{{ route('pacientes.edit', $paciente) }}',
+                        urlNuevaOrden: '{{ route('ordenes.create', ['paciente_id' => $paciente->id]) }}'
                     })">
-                    <td class="px-2 py-1.5 border-r border-gray-200 font-mono font-semibold text-blue-700">{{ $orden->numero_orden }}</td>
-                    <td class="px-2 py-1.5 border-r border-gray-200 text-gray-600">{{ $orden->fecha_entrada?->format('d-m-Y') }}</td>
-                    <td class="px-2 py-1.5 border-r border-gray-200 text-gray-600 text-center">{{ $orden->numero_entrada }}</td>
-                    <td class="px-2 py-1.5 border-r border-gray-200 text-gray-700 capitalize">{{ ucfirst($orden->tipo_paciente) }}</td>
-                    <td class="px-2 py-1.5 border-r border-gray-200 text-gray-600">{{ $orden->numero_factura ?? '0' }}</td>
-                    <td class="px-2 py-1.5 border-r border-gray-200 font-mono text-blue-600">{{ $orden->paciente?->codigo ?? '—' }}</td>
-                    <td class="px-2 py-1.5 border-r border-gray-200 font-medium text-gray-800 uppercase">{{ strtoupper($orden->paciente?->nombre ?? '(eliminado)') }}</td>
-                    <td class="px-2 py-1.5 border-r border-gray-200 text-gray-500">{{ $orden->paciente?->cedula ?? '—' }}</td>
-                    <td class="px-2 py-1.5 border-r border-gray-200 text-gray-500 text-center">{{ $orden->paciente?->edad ?? '—' }}{{ $orden->paciente?->edad ? 'a' : '' }} / {{ $orden->paciente?->sexo ?? '—' }}</td>
-                    <td class="px-2 py-1.5 border-r border-gray-200 text-gray-500 truncate">{{ $orden->paciente?->medico_tratante ?? '—' }}</td>
-                    <td class="px-2 py-1.5 border-r border-gray-200 text-gray-400">{{ $orden->laboratorio?->nombre ?? '—' }}</td>
-                    <td class="px-2 py-1.5 border-r border-gray-200 text-gray-400 truncate">{{ $orden->paciente?->direccion ?? '—' }}</td>
-                    <td class="px-2 py-1.5 border-r border-gray-200 text-gray-400">{{ $orden->paciente?->telefono ?? '—' }}</td>
+                    <td class="px-2 py-1.5 border-r border-gray-200 font-mono text-blue-600">{{ $paciente->codigo }}</td>
+                    <td class="px-2 py-1.5 border-r border-gray-200 font-medium text-gray-800 uppercase">{{ strtoupper($paciente->nombre) }}</td>
+                    <td class="px-2 py-1.5 border-r border-gray-200 text-gray-500">{{ $paciente->cedula ?? '—' }}</td>
+                    <td class="px-2 py-1.5 border-r border-gray-200 text-gray-500 text-center">{{ $paciente->edad ?? '—' }}{{ $paciente->edad ? 'a' : '' }} / {{ $paciente->sexo ?? '—' }}</td>
+                    <td class="px-2 py-1.5 border-r border-gray-200 text-gray-500 truncate">{{ $paciente->medico_tratante ?? '—' }}</td>
+                    <td class="px-2 py-1.5 border-r border-gray-200 text-gray-500 truncate">{{ $paciente->seguro_medico ?? '—' }}</td>
+                    <td class="px-2 py-1.5 border-r border-gray-200 font-mono text-blue-700">{{ $orden?->numero_orden ?? '—' }}</td>
+                    <td class="px-2 py-1.5 border-r border-gray-200 text-gray-600">{{ $orden?->fecha_entrada?->format('d-m-Y') ?? '—' }}</td>
+                    <td class="px-2 py-1.5 border-r border-gray-200 text-gray-400">{{ $paciente->laboratorio?->nombre ?? '—' }}</td>
+                    <td class="px-2 py-1.5 border-r border-gray-200 text-gray-400 truncate">{{ $paciente->direccion ?? '—' }}</td>
+                    <td class="px-2 py-1.5 border-r border-gray-200 text-gray-400">{{ $paciente->telefono ?? '—' }}</td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="14" class="px-4 py-16 text-center text-gray-400">
-                        <i class="fas fa-inbox text-4xl mb-3 block"></i>No hay registros
+                    <td colspan="11" class="px-4 py-16 text-center text-gray-400">
+                        <i class="fas fa-inbox text-4xl mb-3 block"></i>No hay pacientes registrados
                     </td>
                 </tr>
                 @endforelse
@@ -87,46 +84,38 @@
         </table>
     </div>
 
-    @if($ordenes->hasPages())
+    @if($pacientes->hasPages())
     <div class="px-4 py-2 border-t border-gray-200 bg-gray-50 text-xs text-gray-500 flex items-center justify-between">
-        <span>{{ $ordenes->total() }} registros</span>
-        {{ $ordenes->appends(request()->query())->links() }}
+        <span>{{ $pacientes->total() }} pacientes</span>
+        {{ $pacientes->appends(request()->query())->links() }}
     </div>
     @endif
-
 </div>
 
-{{-- ── MODAL de opciones ────────────────────────────────────────────────── --}}
+{{-- Modal de opciones --}}
 <div x-show="modal" x-cloak
     class="fixed inset-0 z-50 flex items-center justify-center"
     @keydown.escape.window="modal = false">
-
-    {{-- Fondo oscuro --}}
     <div class="absolute inset-0 bg-black bg-opacity-40" @click="modal = false"></div>
-
-    {{-- Tarjeta del modal --}}
     <div class="relative bg-white rounded-2xl shadow-2xl w-80 overflow-hidden z-10">
-
-        {{-- Encabezado --}}
         <div class="bg-blue-700 text-white px-5 py-4">
             <p class="text-xs text-blue-200 uppercase tracking-wider mb-0.5">Paciente seleccionado</p>
             <p class="font-bold text-base leading-tight" x-text="selected?.nombre"></p>
-            <p class="text-blue-200 text-xs mt-0.5">Orden # <span x-text="selected?.numero"></span></p>
+            <p class="text-blue-200 text-xs mt-0.5" x-show="selected?.numero">Orden # <span x-text="selected?.numero"></span></p>
         </div>
-
-        {{-- Opciones --}}
         <div class="p-4 space-y-2">
+            <template x-if="selected?.ordenId">
+                <a :href="selected?.urlAbrir"
+                    class="flex items-center gap-3 w-full px-4 py-3 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 font-medium text-sm transition">
+                    <i class="fas fa-folder-open w-5 text-center text-blue-500"></i>
+                    Abrir / Ver resultados
+                </a>
+            </template>
 
-            <a :href="selected?.urlAbrir"
-                class="flex items-center gap-3 w-full px-4 py-3 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 font-medium text-sm transition">
-                <i class="fas fa-folder-open w-5 text-center text-blue-500"></i>
-                Abrir / Ver resultados
-            </a>
-
-            <a :href="selected?.urlImprimir + '/imprimir'"
-                class="flex items-center gap-3 w-full px-4 py-3 rounded-xl bg-green-50 hover:bg-green-100 text-green-700 font-medium text-sm transition">
-                <i class="fas fa-print w-5 text-center text-green-500"></i>
-                Imprimir resultados
+            <a :href="selected?.urlNuevaOrden"
+                class="flex items-center gap-3 w-full px-4 py-3 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 font-medium text-sm transition">
+                <i class="fas fa-plus-circle w-5 text-center text-purple-500"></i>
+                Nueva orden para este paciente
             </a>
 
             <a :href="selected?.urlEditar"
@@ -135,14 +124,8 @@
                 Editar datos del paciente
             </a>
 
-            <a :href="selected?.urlNuevaOrden"
-                class="flex items-center gap-3 w-full px-4 py-3 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 font-medium text-sm transition">
-                <i class="fas fa-plus-circle w-5 text-center text-purple-500"></i>
-                Nueva orden para este paciente
-            </a>
-
             <button @click="
-                if(confirm('¿Eliminar este paciente? Esta acción no se puede deshacer.')) {
+                if(confirm('¿Eliminar este paciente y todas sus órdenes?')) {
                     document.getElementById('form-borrar-' + selected.id).submit();
                 }"
                 class="flex items-center gap-3 w-full px-4 py-3 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 font-medium text-sm transition">
@@ -150,8 +133,6 @@
                 Borrar paciente
             </button>
         </div>
-
-        {{-- Cerrar --}}
         <div class="px-4 pb-4">
             <button @click="modal = false"
                 class="w-full py-2 text-xs text-gray-400 hover:text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50">
@@ -161,14 +142,14 @@
     </div>
 </div>
 
-{{-- Forms ocultos para borrar paciente --}}
-@foreach($ordenes as $orden)
-<form id="form-borrar-{{ $orden->id }}" method="POST" action="{{ route('pacientes.destroy', $orden->paciente_id) }}" class="hidden">
+{{-- Forms ocultos para borrar --}}
+@foreach($pacientes as $paciente)
+<form id="form-borrar-{{ $paciente->id }}" method="POST" action="{{ route('pacientes.destroy', $paciente->id) }}" class="hidden">
     @csrf @method('DELETE')
 </form>
 @endforeach
 
-</div>{{-- fin x-data --}}
+</div>
 
 @push('scripts')
 <script src="//unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>

@@ -12,19 +12,21 @@ class OrdenController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Orden::with(['paciente', 'laboratorio'])
-            ->orderByDesc('id');
+        $query = Paciente::with(['laboratorio',
+            'ordenes' => fn ($q) => $q->latest()->limit(1)
+        ])->orderByDesc('id');
 
         if ($buscar = $request->get('buscar')) {
-            $query->whereHas('paciente', fn ($q) => $q
-                ->where('nombre', 'ilike', "%$buscar%")
-                ->orWhere('cedula', 'ilike', "%$buscar%")
-                ->orWhere('codigo', 'ilike', "%$buscar%")
-            )->orWhere('numero_orden', 'ilike', "%$buscar%");
+            $query->where(function ($q) use ($buscar) {
+                $q->where('nombre', 'ilike', "%$buscar%")
+                  ->orWhere('cedula', 'ilike', "%$buscar%")
+                  ->orWhere('codigo', 'ilike', "%$buscar%")
+                  ->orWhereHas('ordenes', fn ($o) => $o->where('numero_orden', 'ilike', "%$buscar%"));
+            });
         }
 
-        $ordenes = $query->paginate(50)->withQueryString();
-        return view('ordenes.index', compact('ordenes'));
+        $pacientes = $query->paginate(50)->withQueryString();
+        return view('ordenes.index', compact('pacientes'));
     }
 
     public function create(Request $request)
