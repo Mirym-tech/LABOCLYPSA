@@ -3,126 +3,141 @@
 <head>
 <meta charset="UTF-8">
 <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: DejaVu Sans, sans-serif; font-size: 10px; color: #1a1a1a; }
-    .header { background: #1e3a8a; color: white; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; }
-    .header h1 { font-size: 18px; font-weight: bold; letter-spacing: 2px; }
-    .header .sub { font-size: 9px; opacity: 0.8; margin-top: 2px; }
-    .header .orden { text-align: right; font-size: 13px; font-weight: bold; }
-    .paciente-bar { background: #dbeafe; border-bottom: 2px solid #1e3a8a; padding: 8px 20px; }
-    .paciente-bar table { width: 100%; }
-    .paciente-bar td { padding: 1px 4px; font-size: 9.5px; }
-    .paciente-bar .label { color: #1e40af; font-weight: bold; }
-    .content { padding: 12px 20px; }
-    h2 { font-size: 11px; color: #1e3a8a; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;
-         border-bottom: 2px solid #1e3a8a; padding-bottom: 3px; margin: 12px 0 6px; }
-    table.results { width: 100%; border-collapse: collapse; font-size: 9.5px; }
-    table.results th { background: #eff6ff; color: #1e3a8a; font-weight: bold; padding: 4px 8px; border: 1px solid #bfdbfe; text-align: left; }
-    table.results td { padding: 3px 8px; border: 1px solid #e5e7eb; }
-    table.results tr:nth-child(even) td { background: #f8fafc; }
-    .flag-high { color: #dc2626; font-weight: bold; }
-    .flag-low  { color: #2563eb; font-weight: bold; }
-    .obs { border: 1px solid #d1d5db; padding: 6px 10px; border-radius: 4px; min-height: 30px; font-size: 9px; }
-    .footer { position: fixed; bottom: 0; width: 100%; border-top: 1px solid #d1d5db; padding: 6px 20px; font-size: 8px; color: #6b7280; display: flex; justify-content: space-between; }
-    .firma { border-top: 1px solid #374151; margin-top: 30px; width: 200px; text-align: center; padding-top: 4px; font-size: 9px; }
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: DejaVu Sans, Arial, sans-serif; font-size: 9.5px; color: #000; }
+.header { display:table; width:100%; padding: 6px 10px 4px; border-bottom: 2px solid #000; }
+.header-logo { display:table-cell; width:70px; vertical-align:middle; text-align:center; }
+.logo-circle { border: 2px solid #1a3a8a; border-radius: 50%; width: 55px; height: 55px; line-height: 55px; text-align:center; font-size:22px; color:#1a3a8a; display:inline-block; }
+.header-info { display:table-cell; vertical-align:middle; padding-left:8px; }
+.lab-name { font-size:18px; font-weight:bold; color:#000; letter-spacing:1px; }
+.lab-subtitle { font-size:11px; font-weight:bold; color:#1a3a8a; text-transform:uppercase; }
+.lab-address { font-size:8px; color:#333; margin-top:2px; }
+.lab-habilitacion { font-size:8.5px; color:#cc0000; font-weight:bold; margin-top:2px; }
+.titulo { text-align:center; margin: 8px 10px 4px; }
+.titulo-sub { font-size:10px; font-weight:bold; letter-spacing:1px; }
+.titulo-tipo { font-size:14px; font-weight:bold; letter-spacing:3px; text-decoration:underline; margin-top:2px; }
+.datos-paciente { margin: 6px 10px; border: 1px solid #000; }
+.datos-row { display:table; width:100%; border-bottom: 1px solid #999; }
+.datos-row:last-child { border-bottom: none; }
+.datos-cell { display:table-cell; padding: 2px 6px; width:50%; font-size:9px; }
+.datos-cell-right { display:table-cell; padding: 2px 6px; width:50%; font-size:9px; border-left: 1px solid #999; }
+.datos-valor { font-weight:bold; }
+.section-header { background:#e8e8e8; font-weight:bold; font-size:8.5px; text-align:center; padding:2px; text-transform:uppercase; letter-spacing:1px; border-bottom:1px solid #000; }
+.res-table { width:100%; border-collapse:collapse; margin: 0 10px; width:calc(100% - 20px); }
+.res-table th { background:#e0e0e0; font-size:8.5px; font-weight:bold; padding:2px 6px; border:1px solid #999; text-align:left; }
+.res-table td { padding:2px 6px; font-size:9px; border:1px solid #ddd; }
+.res-table td:first-child { font-weight:bold; width:38%; }
+.res-table td:nth-child(2) { font-weight:bold; width:18%; }
+.obs-box { margin: 6px 10px; border: 1px solid #000; padding: 4px 8px; min-height: 35px; font-size:9px; }
+.obs-label { font-weight:bold; margin-bottom:2px; }
+.firmas { margin: 10px 10px 4px; display:table; width: calc(100% - 20px); }
+.firma-cell { display:table-cell; width:50%; padding: 0 10px; }
+.firma-line { border-top: 1px solid #000; margin-top: 25px; padding-top: 3px; font-size:9px; font-weight:bold; text-align:center; text-transform:uppercase; }
+.footer { margin: 6px 10px 0; border-top: 1px solid #ccc; padding-top: 3px; font-size:8px; display:table; width: calc(100% - 20px); }
+.footer-cell { display:table-cell; width:50%; }
+.footer-cell-right { display:table-cell; width:50%; text-align:right; }
 </style>
 </head>
 <body>
+@php
+    $r = $oa->resultadoHematologia;
+    $o = $oa->orden;
+    $p = $o->paciente;
+@endphp
 
-{{-- Encabezado --}}
 <div class="header">
-    <div>
-        <div class="h1">LABOCLYPSA</div>
-        <div class="sub">{{ $oa->orden->laboratorio->nombre }} — {{ $oa->orden->laboratorio->direccion }}</div>
-        <div class="sub">Tel: {{ $oa->orden->laboratorio->telefono }}</div>
+    <div class="header-logo">
+        <div class="logo-circle">&#128300;</div>
     </div>
-    <div class="orden">
-        Orden # {{ $oa->orden->numero_orden }}<br>
-        <span style="font-size:10px; font-weight:normal;">{{ $oa->orden->fecha_entrada?->format('d/m/Y') }}</span>
+    <div class="header-info">
+        <div class="lab-name">LABOCLYPSA</div>
+        <div class="lab-subtitle">Laboratorio Clínico Ysabel Pérez</div>
+        <div class="lab-address">Agustín C. López # 22, Entrada Cerros Sabana Perdida, Santo Domingo Norte, R. D.</div>
+        <div class="lab-address">Teléfonos: 809-234-3322 &nbsp; Rnc: 0011145916</div>
+        <div class="lab-habilitacion">Habilitación No. A-02179</div>
     </div>
 </div>
 
-{{-- Datos del paciente --}}
-@php $p = $oa->orden->paciente; $r = $oa->resultadoHematologia; @endphp
-<div class="paciente-bar">
-    <table>
-        <tr>
-            <td><span class="label">Paciente:</span> {{ $p->nombre }}</td>
-            <td><span class="label">Edad:</span> {{ $p->edad }} años</td>
-            <td><span class="label">Sexo:</span> {{ $p->sexo == 'F' ? 'Femenino' : 'Masculino' }}</td>
-            <td><span class="label">Cód:</span> {{ $p->codigo }}</td>
-        </tr>
-        <tr>
-            <td><span class="label">Médico:</span> {{ $p->medico_tratante ?? '—' }}</td>
-            <td><span class="label">Seguro:</span> {{ $p->seguro_medico ?? '—' }}</td>
-            <td><span class="label">Factura:</span> {{ $oa->orden->numero_factura ?? '—' }}</td>
-            <td><span class="label">Bioanalista:</span> {{ $r->bioanalista?->name ?? '—' }}</td>
-        </tr>
-    </table>
+<div class="titulo">
+    <div class="titulo-sub">RESULTADO ANÁLISIS CLÍNICO</div>
+    <div class="titulo-tipo">HEMATOLOGÍA</div>
 </div>
 
-<div class="content">
-    <h2>Hematología — Hemograma Completo (CBC)</h2>
-    <table class="results">
-        <tr><th>Parámetro</th><th>Resultado</th><th>Unidad</th><th>Valor de Referencia</th></tr>
-        @php
-        $params = [
-            ['label'=>'WBC','field'=>'wbc','unit'=>'10³/UL','ref'=>'4.0 – 10.0'],
-            ['label'=>'Lymph#','field'=>'lymph_abs','unit'=>'10³/UL','ref'=>'0.60 – 4.10'],
-            ['label'=>'Mid#','field'=>'mid_abs','unit'=>'10³/UL','ref'=>'0.10 – 0.90'],
-            ['label'=>'Gran#','field'=>'gran_abs','unit'=>'10³/UL','ref'=>'2.00 – 7.80'],
-            ['label'=>'Lymph%','field'=>'lymph_pct','unit'=>'%','ref'=>'20.0 – 50.0'],
-            ['label'=>'Mid%','field'=>'mid_pct','unit'=>'%','ref'=>'3.0 – 10.0'],
-            ['label'=>'Gran%','field'=>'gran_pct','unit'=>'%','ref'=>'40.0 – 70.0'],
-            ['label'=>'RBC','field'=>'rbc','unit'=>'10³/UL','ref'=>'3.80 – 5.80'],
-            ['label'=>'HGB','field'=>'hgb','unit'=>'g/dL','ref'=>'11.0 – 16.5'],
-            ['label'=>'HCT','field'=>'hct','unit'=>'%','ref'=>'35.0 – 50.0'],
-            ['label'=>'MCV','field'=>'mcv','unit'=>'fL','ref'=>'80.0 – 100.0'],
-            ['label'=>'MCH','field'=>'mch','unit'=>'pg','ref'=>'26.5 – 33.5'],
-            ['label'=>'MCHC','field'=>'mchc','unit'=>'g/dL','ref'=>'32.2 – 36.0'],
-            ['label'=>'RDW-CV','field'=>'rdw_cv','unit'=>'%','ref'=>'10.0 – 15.0'],
-            ['label'=>'RDW-SD','field'=>'rdw_sd','unit'=>'fL','ref'=>'35.0 – 56.0'],
-            ['label'=>'PLT','field'=>'plt','unit'=>'10³/UL','ref'=>'150 – 450'],
-            ['label'=>'MPV','field'=>'mpv','unit'=>'fL','ref'=>'7.0 – 11.0'],
-            ['label'=>'PDW','field'=>'pdw','unit'=>'%','ref'=>'10.0 – 18.0'],
-            ['label'=>'PCT','field'=>'pct','unit'=>'%','ref'=>'0.100 – 0.500'],
-            ['label'=>'P-LCR','field'=>'plcr','unit'=>'%','ref'=>'13.0 – 43.0'],
-        ];
-        @endphp
-        @foreach($params as $p)
-        <tr>
-            <td><strong>{{ $p['label'] }}</strong></td>
-            <td><strong>{{ $r->{$p['field']} ?? '—' }}</strong></td>
-            <td>{{ $p['unit'] }}</td>
-            <td style="color:#6b7280">{{ $p['ref'] }}</td>
-        </tr>
-        @endforeach
-    </table>
+<div class="datos-paciente">
+    <div class="datos-row">
+        <div class="datos-cell">Paciente : <span class="datos-valor">{{ strtoupper($p->nombre ?? '') }}</span></div>
+        <div class="datos-cell-right">Seguro : <span class="datos-valor">{{ $p->seguro_medico ?? '' }}</span></div>
+    </div>
+    <div class="datos-row">
+        <div class="datos-cell">Dirección : <span class="datos-valor">{{ $p->direccion ?? '' }}</span></div>
+        <div class="datos-cell-right">Médico : <span class="datos-valor">{{ $p->medico_tratante ?? '' }}</span></div>
+    </div>
+    <div class="datos-row">
+        <div class="datos-cell">Teléfono : <span class="datos-valor">{{ $p->telefono ?? '000-000-0000' }}</span></div>
+        <div class="datos-cell-right">Tipo : <span class="datos-valor">{{ ucfirst($o->tipo_paciente) }}</span> &nbsp;&nbsp; No. Registro: <span class="datos-valor">{{ $o->numero_orden }}</span></div>
+    </div>
+    <div class="datos-row">
+        <div class="datos-cell">Edad : <span class="datos-valor">{{ $p->edad ?? '' }}</span> &nbsp;&nbsp;&nbsp; LABORATORIO No. <span class="datos-valor">{{ $o->numero_entrada }}</span></div>
+        <div class="datos-cell-right">Fecha: <span class="datos-valor">{{ $o->fecha_entrada?->format('d-m-Y') }}</span></div>
+    </div>
+</div>
 
-    @if($r->observacion_general)
-    <h2>Observación</h2>
-    <div class="obs">{{ $r->observacion_general }}</div>
-    @endif
+<div class="section-header" style="margin: 4px 10px 0;">Hemograma Completo (CBC)</div>
+@php
+$params = [
+    ['label'=>'WBC',    'field'=>'wbc',    'unit'=>'10³/UL', 'ref'=>'4.0 – 10.0'],
+    ['label'=>'Lymph#', 'field'=>'lymph_abs','unit'=>'10³/UL','ref'=>'0.60 – 4.10'],
+    ['label'=>'Mid#',   'field'=>'mid_abs',  'unit'=>'10³/UL','ref'=>'0.10 – 0.90'],
+    ['label'=>'Gran#',  'field'=>'gran_abs', 'unit'=>'10³/UL','ref'=>'2.00 – 7.80'],
+    ['label'=>'Lymph%', 'field'=>'lymph_pct','unit'=>'%',     'ref'=>'20.0 – 50.0'],
+    ['label'=>'Mid%',   'field'=>'mid_pct',  'unit'=>'%',     'ref'=>'3.0 – 10.0'],
+    ['label'=>'Gran%',  'field'=>'gran_pct', 'unit'=>'%',     'ref'=>'40.0 – 70.0'],
+    ['label'=>'RBC',    'field'=>'rbc',      'unit'=>'10⁶/UL','ref'=>'3.80 – 5.80'],
+    ['label'=>'HGB',    'field'=>'hgb',      'unit'=>'g/dL',  'ref'=>'11.0 – 16.5'],
+    ['label'=>'HCT',    'field'=>'hct',      'unit'=>'%',     'ref'=>'35.0 – 50.0'],
+    ['label'=>'MCV',    'field'=>'mcv',      'unit'=>'fL',    'ref'=>'80.0 – 100.0'],
+    ['label'=>'MCH',    'field'=>'mch',      'unit'=>'pg',    'ref'=>'26.5 – 33.5'],
+    ['label'=>'MCHC',   'field'=>'mchc',     'unit'=>'g/dL',  'ref'=>'32.2 – 36.0'],
+    ['label'=>'RDW-CV', 'field'=>'rdw_cv',   'unit'=>'%',     'ref'=>'10.0 – 15.0'],
+    ['label'=>'RDW-SD', 'field'=>'rdw_sd',   'unit'=>'fL',    'ref'=>'35.0 – 56.0'],
+    ['label'=>'PLT',    'field'=>'plt',      'unit'=>'10³/UL','ref'=>'150 – 450'],
+    ['label'=>'MPV',    'field'=>'mpv',      'unit'=>'fL',    'ref'=>'7.0 – 11.0'],
+    ['label'=>'PDW',    'field'=>'pdw',      'unit'=>'%',     'ref'=>'10.0 – 18.0'],
+    ['label'=>'PCT',    'field'=>'pct',      'unit'=>'%',     'ref'=>'0.100 – 0.500'],
+    ['label'=>'P-LCR',  'field'=>'plcr',     'unit'=>'%',     'ref'=>'13.0 – 43.0'],
+];
+@endphp
+<table class="res-table" style="margin:0 10px; width:calc(100% - 20px); border:1px solid #000;">
+    <tr>
+        <th>Parámetro</th><th>Resultado</th><th>Unidad</th><th>Valor de Referencia</th>
+    </tr>
+    @foreach($params as $param)
+    <tr>
+        <td>{{ $param['label'] }}</td>
+        <td>{{ $r->{$param['field']} ?? '—' }}</td>
+        <td style="color:#555">{{ $param['unit'] }}</td>
+        <td style="color:#777">{{ $param['ref'] }}</td>
+    </tr>
+    @endforeach
+</table>
 
-    <table style="width:100%; margin-top:40px;">
-        <tr>
-            <td style="text-align:center">
-                <div class="firma">
-                    {{ $r->bioanalista?->name ?? '____________________________' }}<br>
-                    Bioanalista
-                </div>
-            </td>
-            <td style="text-align:right; font-size:8px; color:#9ca3af;">
-                Impreso: {{ now()->format('d/m/Y H:i') }}<br>
-                @if($r->validado) Validado: {{ $r->validado_at?->format('d/m/Y H:i') }} @endif
-            </td>
-        </tr>
-    </table>
+<div class="obs-box" style="margin-top:6px;">
+    <div class="obs-label">OBSERVACIÓN:</div>
+    <div style="margin-top:4px;">{{ $r->observacion_general ?? '' }}</div>
+</div>
+
+<div class="firmas">
+    <div class="firma-cell">
+        <div class="firma-line">BIOANALISTA</div>
+    </div>
+    <div class="firma-cell">
+        <div class="firma-line">DIRECTOR TÉCNICO</div>
+    </div>
 </div>
 
 <div class="footer">
-    <span>LABOCLYPSA — Sistema de Laboratorio Clínico</span>
-    <span>Confidencial — Solo para uso médico</span>
+    <div class="footer-cell">Creó: {{ $r->bioanalista?->name ?? auth()->user()?->name }}</div>
+    <div class="footer-cell-right">Imprimió: {{ auth()->user()?->name }} &nbsp; {{ now()->format('g:iA') }}</div>
 </div>
 
 </body>
