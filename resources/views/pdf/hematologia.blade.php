@@ -47,7 +47,7 @@ body { font-family: DejaVu Sans, Arial, sans-serif; font-size: 9.5px; color: #00
 
 <div class="header">
     <div class="header-logo">
-        <div class="logo-circle">&#128300;</div>
+        <img src="{{ 'data:image/png;base64,'.base64_encode(file_get_contents(public_path('img/logo.png'))) }}" style="width:60px;height:60px;object-fit:contain;border-radius:6px;">
     </div>
     <div class="header-info">
         <div class="lab-name">LABOCLYPSA</div>

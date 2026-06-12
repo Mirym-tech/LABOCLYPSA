@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'LABOCLYPSA') — Sistema de Laboratorio</title>
+    <link rel="icon" type="image/png" href="{{ asset('img/logo.png') }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -22,7 +23,7 @@
 <nav class="bg-blue-900 text-white shadow-md z-30 relative">
     <div class="max-w-full px-4 flex items-center justify-between h-14">
         <a href="{{ route('home') }}" class="flex items-center gap-3 hover:opacity-80 transition">
-            <i class="fas fa-flask text-blue-300 text-xl"></i>
+            <img src="{{ asset('img/logo.png') }}" alt="Logo" class="h-9 w-9 rounded-full object-cover bg-white">
             <span class="font-bold text-lg tracking-wide">LABOCLYPSA</span>
         </a>
         <div class="flex items-center gap-4">
