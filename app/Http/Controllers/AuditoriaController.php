@@ -28,8 +28,8 @@ class AuditoriaController extends Controller
         }
 
         $actividades = $query->paginate(30)->withQueryString();
-        $usuarios = \App\Models\User::orderBy('name')->get();
-        $logs = Activity::distinct('log_name')->pluck('log_name');
+        $usuarios = \App\Models\User::select('id', 'name')->orderBy('name')->get();
+        $logs = Activity::distinct()->pluck('log_name');
 
         return view('auditoria.index', compact('actividades', 'usuarios', 'logs'));
     }

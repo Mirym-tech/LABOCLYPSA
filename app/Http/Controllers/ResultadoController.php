@@ -18,7 +18,13 @@ class ResultadoController extends Controller
 {
     private function bioanalistas()
     {
-        return User::role('bioanalista')->where('activo', true)->orderBy('name')->get();
+        return cache()->remember('bioanalistas_activos', 300, fn () =>
+            User::role('bioanalista')
+                ->where('activo', true)
+                ->select('id', 'name')
+                ->orderBy('name')
+                ->get()
+        );
     }
 
     private function verificarAcceso(OrdenAnalisis $oa): void

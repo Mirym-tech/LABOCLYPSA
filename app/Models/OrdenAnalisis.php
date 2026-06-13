@@ -9,6 +9,9 @@ class OrdenAnalisis extends Model
     protected $table = 'orden_analisis';
     protected $fillable = ['orden_id', 'analisis_tipo_id', 'estado'];
 
+    // 'tipo' se necesita en cada vista — cargarlo siempre evita N+1
+    protected $with = ['tipo'];
+
     public function orden() { return $this->belongsTo(Orden::class); }
     public function tipo() { return $this->belongsTo(AnalisisTipo::class, 'analisis_tipo_id'); }
     public function resultadoHematologia() { return $this->hasOne(ResultadoHematologia::class); }

@@ -68,13 +68,17 @@ class OrdenController extends Controller
             'estado'         => 'pendiente',
         ]);
 
-        foreach ($request->analisis_ids as $tipoId) {
-            OrdenAnalisis::create([
-                'orden_id'        => $orden->id,
-                'analisis_tipo_id' => $tipoId,
-                'estado'          => 'pendiente',
-            ]);
-        }
+        // Batch insert: 1 query en lugar de N queries
+        $now = now();
+        OrdenAnalisis::insert(
+            collect($request->analisis_ids)->map(fn ($id) => [
+                'orden_id'         => $orden->id,
+                'analisis_tipo_id' => (int) $id,
+                'estado'           => 'pendiente',
+                'created_at'       => $now,
+                'updated_at'       => $now,
+            ])->toArray()
+        );
 
         activity()->on($orden)->log('Orden creada con ' . count($request->analisis_ids) . ' análisis');
 

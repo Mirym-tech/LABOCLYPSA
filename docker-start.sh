@@ -4,6 +4,7 @@ set -e
 php artisan cache:clear
 php artisan config:cache
 php artisan route:cache
+php artisan event:cache
 php artisan view:clear
 php artisan view:cache
 php artisan migrate --force
