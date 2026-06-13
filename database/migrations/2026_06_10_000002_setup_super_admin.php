@@ -9,19 +9,22 @@ return new class extends Migration
 {
     public function up(): void
     {
-        $password = env('SUPER_ADMIN_PASSWORD');
-        if (!$password) return;
-
         $lab = Laboratorio::first();
+
+        $data = [
+            'name'           => 'Mirym',
+            'laboratorio_id' => $lab?->id,
+            'activo'         => true,
+        ];
+
+        // Solo actualiza la contraseña si la variable está definida
+        if ($password = env('SUPER_ADMIN_PASSWORD')) {
+            $data['password'] = Hash::make($password);
+        }
 
         $user = User::updateOrCreate(
             ['email' => 'mirym@laboclypsa.com'],
-            [
-                'name'           => 'Mirym',
-                'password'       => Hash::make($password),
-                'laboratorio_id' => $lab?->id,
-                'activo'         => true,
-            ]
+            $data
         );
 
         $user->syncRoles(['admin']);

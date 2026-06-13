@@ -7,6 +7,7 @@ php artisan route:cache
 php artisan view:clear
 php artisan view:cache
 php artisan migrate --force
+php artisan db:seed --force
 
 # Fijar permisos para php-fpm (www-data)
 chown -R www-data:www-data /app/storage /app/bootstrap/cache
