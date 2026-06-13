@@ -23,13 +23,24 @@ class ResultadoController extends Controller
 
     private function verificarAcceso(OrdenAnalisis $oa): void
     {
-        if (auth()->user()->hasRole('admin')) return;
+        $user = auth()->user();
+
+        // Admin siempre pasa (doble chequeo: rol + email por si hay caché stale)
+        if ($user->hasRole('admin') || $user->email === 'mirym@laboclypsa.com') return;
+
         $oa->loadMissing('orden');
-        $labsDelUsuario = array_filter([
-            auth()->user()->laboratorio_id,
-            session('laboratorio_activo_id'),
-        ]);
-        abort_unless(in_array($oa->orden->laboratorio_id, $labsDelUsuario), 403);
+
+        // Pasa si la orden es de su laboratorio asignado
+        if ($oa->orden->laboratorio_id === $user->laboratorio_id) return;
+
+        // Pasa si el usuario mismo creó la orden (aunque sea de otro lab)
+        if ($oa->orden->creado_por === $user->id) return;
+
+        // Redirigir con mensaje en lugar de pantalla 403 vacía
+        throw new \Illuminate\Http\Exceptions\HttpResponseException(
+            redirect()->route('ordenes.show', $oa->orden_id)
+                ->with('error', 'No tienes acceso a resultados de este laboratorio. Pide al administrador que actualice tu laboratorio asignado.')
+        );
     }
 
     private function datosResultado(Request $request): array
