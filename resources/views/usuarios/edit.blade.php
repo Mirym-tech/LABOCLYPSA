@@ -38,9 +38,20 @@
             <label for="activo" class="text-sm font-medium text-gray-700">Usuario activo</label>
         </div>
     </div>
-    <div class="mt-6 flex gap-3 border-t pt-4">
-        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-medium flex items-center gap-2"><i class="fas fa-save"></i> Actualizar</button>
-        <a href="{{ route('usuarios.index') }}" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-2.5 rounded-lg font-medium">Cancelar</a>
+    <div class="mt-6 flex items-center justify-between border-t pt-4">
+        <div class="flex gap-3">
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-medium flex items-center gap-2"><i class="fas fa-save"></i> Actualizar</button>
+            <a href="{{ route('usuarios.index') }}" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-2.5 rounded-lg font-medium">Cancelar</a>
+        </div>
+        @if($usuario->id !== auth()->id())
+        <form method="POST" action="{{ route('usuarios.destroy', $usuario) }}"
+              onsubmit="return confirm('¿Eliminar al usuario {{ addslashes($usuario->name) }}? Esta acción no se puede deshacer.')">
+            @csrf @method('DELETE')
+            <button type="submit" class="bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-800 px-4 py-2.5 rounded-lg font-medium flex items-center gap-2 text-sm">
+                <i class="fas fa-trash"></i> Eliminar usuario
+            </button>
+        </form>
+        @endif
     </div>
 </div>
 </form>

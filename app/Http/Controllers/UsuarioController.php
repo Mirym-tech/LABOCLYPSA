@@ -76,4 +76,16 @@ class UsuarioController extends Controller
         $usuario->syncRoles([$request->role]);
         return redirect()->route('usuarios.index')->with('success', 'Usuario actualizado.');
     }
+
+    public function destroy(User $usuario)
+    {
+        if ($usuario->id === auth()->id()) {
+            return back()->with('error', 'No puedes eliminar tu propia cuenta.');
+        }
+
+        $nombre = $usuario->name;
+        $usuario->delete();
+
+        return redirect()->route('usuarios.index')->with('success', "Usuario \"{$nombre}\" eliminado.");
+    }
 }

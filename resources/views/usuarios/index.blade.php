@@ -37,8 +37,19 @@
                     <span class="text-red-400 text-xs font-medium"><i class="fas fa-circle mr-1"></i>Inactivo</span>
                 @endif
             </td>
-            <td class="px-4 py-2.5 text-right">
-                <a href="{{ route('usuarios.edit', $u) }}" class="text-blue-600 hover:text-blue-800 text-sm"><i class="fas fa-edit"></i></a>
+            <td class="px-4 py-2.5 text-right flex items-center justify-end gap-3">
+                <a href="{{ route('usuarios.edit', $u) }}" class="text-blue-600 hover:text-blue-800 text-sm" title="Editar">
+                    <i class="fas fa-edit"></i>
+                </a>
+                @if($u->id !== auth()->id())
+                <form method="POST" action="{{ route('usuarios.destroy', $u) }}"
+                      onsubmit="return confirm('¿Eliminar al usuario {{ addslashes($u->name) }}? Esta acción no se puede deshacer.')">
+                    @csrf @method('DELETE')
+                    <button type="submit" class="text-red-500 hover:text-red-700 text-sm" title="Eliminar">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </form>
+                @endif
             </td>
         </tr>
         @endforeach

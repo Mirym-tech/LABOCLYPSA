@@ -15,7 +15,7 @@ Route::post('login', [LoginController::class, 'login'])->middleware('throttle:5,
 Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 
 // ── Autenticado ────────────────────────────────────────────────────────────────
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'forzar-lab'])->group(function () {
 
     Route::get('/', fn () => redirect()->route('ordenes.index'))->name('home');
 
@@ -79,6 +79,6 @@ Route::middleware(['auth'])->group(function () {
 
     // Gestión de usuarios — solo mirym@laboclypsa.com
     Route::middleware(['role:admin', 'superadmin'])->group(function () {
-        Route::resource('usuarios', UsuarioController::class)->except(['show', 'destroy']);
+        Route::resource('usuarios', UsuarioController::class)->except(['show']);
     });
 });

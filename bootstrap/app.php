@@ -19,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'permission'         => PermissionMiddleware::class,
             'role_or_permission' => RoleOrPermissionMiddleware::class,
             'superadmin'         => \App\Http\Middleware\EsSuperAdmin::class,
+            'forzar-lab'         => \App\Http\Middleware\ForzarLaboratorio::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

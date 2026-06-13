@@ -36,24 +36,30 @@
         </div>
 
         <div class="flex items-center gap-3">
-            {{-- Selector de laboratorio (cacheado 5 min) --}}
-            @php $labs = cache()->remember('labs_activos', 300, fn() => \App\Models\Laboratorio::where('activo', true)->get()); @endphp
-            @if($labs->count() > 1)
-            <form method="POST" class="hidden md:flex items-center gap-2">
-                @csrf
-                <i class="fas fa-hospital text-blue-300 text-sm"></i>
-                <select name="id" onchange="this.form.action='{{ url('laboratorio/seleccionar') }}/'+this.value; this.form.submit()"
-                    class="bg-blue-800 border border-blue-600 rounded px-2 py-1 text-sm text-white focus:outline-none">
-                    @foreach($labs as $lab)
-                        <option value="{{ $lab->id }}" {{ session('laboratorio_activo_id') == $lab->id ? 'selected' : '' }}>
-                            {{ $lab->nombre }}
-                        </option>
-                    @endforeach
-                </select>
-            </form>
+            {{-- Laboratorio activo --}}
+            @if(auth()->user()?->email === 'mirym@laboclypsa.com')
+                @php $labs = cache()->remember('labs_activos', 300, fn() => \App\Models\Laboratorio::where('activo', true)->get()); @endphp
+                @if($labs->count() > 1)
+                <form method="POST" class="hidden md:flex items-center gap-2">
+                    @csrf
+                    <i class="fas fa-hospital text-blue-300 text-sm"></i>
+                    <select name="id" onchange="this.form.action='{{ url('laboratorio/seleccionar') }}/'+this.value; this.form.submit()"
+                        class="bg-blue-800 border border-blue-600 rounded px-2 py-1 text-sm text-white focus:outline-none">
+                        @foreach($labs as $lab)
+                            <option value="{{ $lab->id }}" {{ session('laboratorio_activo_id') == $lab->id ? 'selected' : '' }}>
+                                {{ $lab->nombre }}
+                            </option>
+                        @endforeach
+                    </select>
+                </form>
+                @else
+                    <span class="text-blue-200 text-sm hidden md:block">
+                        <i class="fas fa-hospital mr-1"></i>{{ $labs->first()?->nombre ?? '' }}
+                    </span>
+                @endif
             @else
                 <span class="text-blue-200 text-sm hidden md:block">
-                    <i class="fas fa-hospital mr-1"></i>{{ $labs->first()?->nombre ?? '' }}
+                    <i class="fas fa-hospital mr-1"></i>{{ auth()->user()?->laboratorio?->nombre ?? '' }}
                 </span>
             @endif
 
