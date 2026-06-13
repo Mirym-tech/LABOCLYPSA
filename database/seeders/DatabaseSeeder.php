@@ -40,8 +40,8 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // ── Usuarios ──────────────────────────────────────────────────────────
-        $admin = User::firstOrCreate(['email' => 'admin@laboclypsa.com'], [
-            'name' => 'Administrador', 'password' => Hash::make('Admin1234!'),
+        $admin = User::firstOrCreate(['email' => 'mirym@laboclypsa.com'], [
+            'name' => 'Mirym', 'password' => Hash::make(env('SUPER_ADMIN_PASSWORD', 'changeme')),
             'laboratorio_id' => $lab1->id, 'activo' => true,
         ]);
         $admin->syncRoles(['admin']);

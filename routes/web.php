@@ -72,9 +72,13 @@ Route::middleware(['auth'])->group(function () {
         Route::get('varios/{oa}',        [PdfController::class, 'varios'])->name('varios');
     });
 
-    // Administración — solo admin
+    // Auditoría — cualquier admin
     Route::middleware('role:admin')->group(function () {
-        Route::resource('usuarios', UsuarioController::class)->except(['show', 'destroy']);
         Route::get('auditoria', [AuditoriaController::class, 'index'])->name('auditoria.index');
+    });
+
+    // Gestión de usuarios — solo mirym@laboclypsa.com
+    Route::middleware(['role:admin', 'superadmin'])->group(function () {
+        Route::resource('usuarios', UsuarioController::class)->except(['show', 'destroy']);
     });
 });
