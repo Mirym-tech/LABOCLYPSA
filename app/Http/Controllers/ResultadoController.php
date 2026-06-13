@@ -68,7 +68,7 @@ class ResultadoController extends Controller
         ResultadoHematologia::updateOrCreate(['orden_analisis_id' => $oa->id], $data);
         $oa->update(['estado' => 'listo']);
 
-        return back()->with('success', 'Resultado de Hematología guardado.');
+        return redirect()->route('ordenes.show', $oa->orden_id)->with('success', 'Resultado de Hematología guardado.');
     }
 
     public function validarHematologia(Request $request, OrdenAnalisis $oa)
@@ -80,7 +80,7 @@ class ResultadoController extends Controller
             'validado_at'  => now(),
         ]);
         activity()->on($oa)->log('Hematología validada');
-        return back()->with('success', 'Resultado validado.');
+        return redirect()->route('ordenes.show', $oa->orden_id)->with('success', 'Resultado validado.');
     }
 
     // ── Bacteriología ──────────────────────────────────────────────────────────
@@ -101,7 +101,7 @@ class ResultadoController extends Controller
         $data['orden_analisis_id'] = $oa->id;
         ResultadoBacteriologia::updateOrCreate(['orden_analisis_id' => $oa->id], $data);
         $oa->update(['estado' => 'listo']);
-        return back()->with('success', 'Resultado de Bacteriología guardado.');
+        return redirect()->route('ordenes.show', $oa->orden_id)->with('success', 'Resultado de Bacteriología guardado.');
     }
 
     // ── Serología ──────────────────────────────────────────────────────────────
@@ -122,7 +122,7 @@ class ResultadoController extends Controller
         $data['orden_analisis_id'] = $oa->id;
         ResultadoSerologia::updateOrCreate(['orden_analisis_id' => $oa->id], $data);
         $oa->update(['estado' => 'listo']);
-        return back()->with('success', 'Serología guardada.');
+        return redirect()->route('ordenes.show', $oa->orden_id)->with('success', 'Serología guardada.');
     }
 
     // ── Cólera ─────────────────────────────────────────────────────────────────
@@ -143,7 +143,7 @@ class ResultadoController extends Controller
         $data['orden_analisis_id'] = $oa->id;
         ResultadoColera::updateOrCreate(['orden_analisis_id' => $oa->id], $data);
         $oa->update(['estado' => 'listo']);
-        return back()->with('success', 'Análisis de Cólera guardado.');
+        return redirect()->route('ordenes.show', $oa->orden_id)->with('success', 'Análisis de Cólera guardado.');
     }
 
     // ── Uroanálisis ────────────────────────────────────────────────────────────
@@ -169,7 +169,7 @@ class ResultadoController extends Controller
         ResultadoUroanalisis::updateOrCreate(['orden_analisis_id' => $oa->id], $uro);
         ResultadoCoprologia::updateOrCreate(['orden_analisis_id' => $oa->id], $cop);
         $oa->update(['estado' => 'listo']);
-        return back()->with('success', 'Uroanálisis/Coprológico guardado.');
+        return redirect()->route('ordenes.show', $oa->orden_id)->with('success', 'Uroanálisis/Coprológico guardado.');
     }
 
     // ── Digestión en Heces ─────────────────────────────────────────────────────
@@ -190,7 +190,7 @@ class ResultadoController extends Controller
         $data['orden_analisis_id'] = $oa->id;
         ResultadoDigestion::updateOrCreate(['orden_analisis_id' => $oa->id], $data);
         $oa->update(['estado' => 'listo']);
-        return back()->with('success', 'Digestión en Heces guardada.');
+        return redirect()->route('ordenes.show', $oa->orden_id)->with('success', 'Digestión en Heces guardada.');
     }
 
     // ── Análisis Varios ────────────────────────────────────────────────────────
