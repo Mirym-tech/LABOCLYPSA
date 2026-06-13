@@ -6,8 +6,15 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-install pdo pdo_pgsql pgsql mbstring xml zip gd opcache \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# OPcache para producción (sin revalidar archivos = máximo rendimiento)
-RUN echo "opcache.enable=1\nopcache.memory_consumption=128\nopcache.max_accelerated_files=10000\nopcache.revalidate_freq=0\nopcache.validate_timestamps=0" \
+# OPcache para producción
+RUN printf "opcache.enable=1\n\
+opcache.memory_consumption=256\n\
+opcache.interned_strings_buffer=16\n\
+opcache.max_accelerated_files=20000\n\
+opcache.validate_timestamps=0\n\
+opcache.revalidate_freq=0\n\
+opcache.save_comments=1\n\
+opcache.fast_shutdown=1\n" \
     > /usr/local/etc/php/conf.d/opcache.ini
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
