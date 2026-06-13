@@ -21,10 +21,27 @@ class ResultadoController extends Controller
         return User::role('bioanalista')->where('activo', true)->orderBy('name')->get();
     }
 
+    private function verificarAcceso(OrdenAnalisis $oa): void
+    {
+        if (auth()->user()->hasRole('admin')) return;
+        $oa->loadMissing('orden');
+        $labsDelUsuario = array_filter([
+            auth()->user()->laboratorio_id,
+            session('laboratorio_activo_id'),
+        ]);
+        abort_unless(in_array($oa->orden->laboratorio_id, $labsDelUsuario), 403);
+    }
+
+    private function datosResultado(Request $request): array
+    {
+        return $request->except(['_token', '_method', 'validado', 'validado_por', 'validado_at']);
+    }
+
     // ── Hematología ────────────────────────────────────────────────────────────
 
     public function hematologia(OrdenAnalisis $oa)
     {
+        $this->verificarAcceso($oa);
         $oa->load('orden.paciente');
         $resultado = $oa->resultadoHematologia ?? new ResultadoHematologia();
         $bioanalistas = $this->bioanalistas();
@@ -33,7 +50,8 @@ class ResultadoController extends Controller
 
     public function guardarHematologia(Request $request, OrdenAnalisis $oa)
     {
-        $data = $request->except(['_token', '_method']);
+        $this->verificarAcceso($oa);
+        $data = $this->datosResultado($request);
         $data['orden_analisis_id'] = $oa->id;
 
         ResultadoHematologia::updateOrCreate(['orden_analisis_id' => $oa->id], $data);
@@ -58,6 +76,7 @@ class ResultadoController extends Controller
 
     public function bacteriologia(OrdenAnalisis $oa)
     {
+        $this->verificarAcceso($oa);
         $oa->load('orden.paciente');
         $resultado = $oa->resultadoBacteriologia ?? new ResultadoBacteriologia();
         $bioanalistas = $this->bioanalistas();
@@ -66,7 +85,8 @@ class ResultadoController extends Controller
 
     public function guardarBacteriologia(Request $request, OrdenAnalisis $oa)
     {
-        $data = $request->except(['_token', '_method']);
+        $this->verificarAcceso($oa);
+        $data = $this->datosResultado($request);
         $data['orden_analisis_id'] = $oa->id;
         ResultadoBacteriologia::updateOrCreate(['orden_analisis_id' => $oa->id], $data);
         $oa->update(['estado' => 'listo']);
@@ -77,6 +97,7 @@ class ResultadoController extends Controller
 
     public function serologia(OrdenAnalisis $oa)
     {
+        $this->verificarAcceso($oa);
         $oa->load('orden.paciente');
         $resultado = $oa->resultadoSerologia ?? new ResultadoSerologia();
         $bioanalistas = $this->bioanalistas();
@@ -85,7 +106,8 @@ class ResultadoController extends Controller
 
     public function guardarSerologia(Request $request, OrdenAnalisis $oa)
     {
-        $data = $request->except(['_token', '_method']);
+        $this->verificarAcceso($oa);
+        $data = $this->datosResultado($request);
         $data['orden_analisis_id'] = $oa->id;
         ResultadoSerologia::updateOrCreate(['orden_analisis_id' => $oa->id], $data);
         $oa->update(['estado' => 'listo']);
@@ -96,6 +118,7 @@ class ResultadoController extends Controller
 
     public function colera(OrdenAnalisis $oa)
     {
+        $this->verificarAcceso($oa);
         $oa->load('orden.paciente');
         $resultado = $oa->resultadoColera ?? new ResultadoColera();
         $bioanalistas = $this->bioanalistas();
@@ -104,7 +127,8 @@ class ResultadoController extends Controller
 
     public function guardarColera(Request $request, OrdenAnalisis $oa)
     {
-        $data = $request->except(['_token', '_method']);
+        $this->verificarAcceso($oa);
+        $data = $this->datosResultado($request);
         $data['orden_analisis_id'] = $oa->id;
         ResultadoColera::updateOrCreate(['orden_analisis_id' => $oa->id], $data);
         $oa->update(['estado' => 'listo']);
@@ -115,6 +139,7 @@ class ResultadoController extends Controller
 
     public function uroanalisis(OrdenAnalisis $oa)
     {
+        $this->verificarAcceso($oa);
         $oa->load('orden.paciente');
         $uro  = $oa->resultadoUroanalisis ?? new ResultadoUroanalisis();
         $cop  = $oa->resultadoCoprologia  ?? new ResultadoCoprologia();
@@ -124,8 +149,10 @@ class ResultadoController extends Controller
 
     public function guardarUroanalisis(Request $request, OrdenAnalisis $oa)
     {
-        $uro = $request->input('uro', []);
-        $cop = $request->input('cop', []);
+        $this->verificarAcceso($oa);
+        $camposBloqueados = ['validado', 'validado_por', 'validado_at', 'orden_analisis_id'];
+        $uro = collect($request->input('uro', []))->except($camposBloqueados)->toArray();
+        $cop = collect($request->input('cop', []))->except($camposBloqueados)->toArray();
         $uro['orden_analisis_id'] = $oa->id;
         $cop['orden_analisis_id'] = $oa->id;
         ResultadoUroanalisis::updateOrCreate(['orden_analisis_id' => $oa->id], $uro);
@@ -138,6 +165,7 @@ class ResultadoController extends Controller
 
     public function digestion(OrdenAnalisis $oa)
     {
+        $this->verificarAcceso($oa);
         $oa->load('orden.paciente');
         $resultado = $oa->resultadoDigestion ?? new ResultadoDigestion();
         $bioanalistas = $this->bioanalistas();
@@ -146,7 +174,8 @@ class ResultadoController extends Controller
 
     public function guardarDigestion(Request $request, OrdenAnalisis $oa)
     {
-        $data = $request->except(['_token', '_method']);
+        $this->verificarAcceso($oa);
+        $data = $this->datosResultado($request);
         $data['orden_analisis_id'] = $oa->id;
         ResultadoDigestion::updateOrCreate(['orden_analisis_id' => $oa->id], $data);
         $oa->update(['estado' => 'listo']);
@@ -157,6 +186,7 @@ class ResultadoController extends Controller
 
     public function varios(OrdenAnalisis $oa)
     {
+        $this->verificarAcceso($oa);
         $oa->load('orden.paciente');
         $resultados   = $oa->resultadoVarios;
         $bioanalistas = $this->bioanalistas();
@@ -165,23 +195,29 @@ class ResultadoController extends Controller
 
     public function guardarVarios(Request $request, OrdenAnalisis $oa)
     {
-        $request->validate([
-            'grupo'    => 'required|string',
-            'sub_grupo' => 'required|string',
-            'resultado' => 'nullable|string',
+        $this->verificarAcceso($oa);
+        $validated = $request->validate([
+            'grupo'     => 'required|string|max:100',
+            'sub_grupo' => 'required|string|max:200',
+            'resultado' => 'nullable|string|max:500',
+            'valor_ref' => 'nullable|string|max:200',
+            'medidas'   => 'nullable|string|max:100',
+            'metodo'    => 'nullable|string|max:200',
+            'muestra'   => 'nullable|string|max:100',
         ]);
 
-        $data = $request->except(['_token']);
-        $data['orden_analisis_id'] = $oa->id;
-        $data['bioanalista_id']    = auth()->id();
+        $validated['orden_analisis_id'] = $oa->id;
+        $validated['bioanalista_id']    = auth()->id();
 
-        ResultadoVarios::create($data);
+        ResultadoVarios::create($validated);
         $oa->update(['estado' => 'listo']);
         return back()->with('success', 'Análisis agregado.');
     }
 
     public function eliminarVarios(ResultadoVarios $resultado)
     {
+        $this->verificarAcceso($resultado->ordenAnalisis);
+        abort_unless(auth()->user()->hasRole(['admin', 'bioanalista']), 403);
         $resultado->delete();
         return back()->with('success', 'Análisis eliminado.');
     }

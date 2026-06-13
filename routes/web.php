@@ -11,7 +11,7 @@ use App\Http\Controllers\Auth\LoginController;
 
 // ── Auth ───────────────────────────────────────────────────────────────────────
 Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
-Route::post('login', [LoginController::class, 'login']);
+Route::post('login', [LoginController::class, 'login'])->middleware('throttle:5,1');
 Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 
 // ── Autenticado ────────────────────────────────────────────────────────────────
@@ -21,7 +21,8 @@ Route::middleware(['auth'])->group(function () {
 
     // Selector de laboratorio activo
     Route::post('laboratorio/seleccionar/{id}', function ($id) {
-        session(['laboratorio_activo_id' => $id]);
+        $lab = \App\Models\Laboratorio::where('id', $id)->where('activo', true)->firstOrFail();
+        session(['laboratorio_activo_id' => $lab->id]);
         return back()->with('success', 'Laboratorio activo cambiado.');
     })->name('laboratorio.seleccionar');
 
