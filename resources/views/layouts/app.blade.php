@@ -36,8 +36,8 @@
         </div>
 
         <div class="flex items-center gap-3">
-            {{-- Selector de laboratorio --}}
-            @php $labs = \App\Models\Laboratorio::where('activo', true)->get(); @endphp
+            {{-- Selector de laboratorio (cacheado 5 min) --}}
+            @php $labs = cache()->remember('labs_activos', 300, fn() => \App\Models\Laboratorio::where('activo', true)->get()); @endphp
             @if($labs->count() > 1)
             <form method="POST" class="hidden md:flex items-center gap-2">
                 @csrf

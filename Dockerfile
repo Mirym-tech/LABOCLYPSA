@@ -26,6 +26,10 @@ RUN mkdir -p storage/framework/cache/data storage/framework/sessions \
 
 COPY docker/nginx.conf /etc/nginx/sites-available/default
 COPY docker/supervisord.conf /etc/supervisor/conf.d/app.conf
+COPY docker/php-fpm-pool.conf /usr/local/etc/php-fpm.d/www.conf
+
+# Forzar cache en archivo para que persista entre peticiones
+ENV CACHE_STORE=file
 
 RUN chmod +x docker-start.sh
 
