@@ -10,48 +10,55 @@
 }">
 
 {{-- Encabezado --}}
-<div class="flex items-center justify-between mb-6">
-    <h1 class="text-2xl font-bold text-gray-800"><i class="fas fa-users text-blue-600 mr-2"></i>Pacientes</h1>
-    <a href="{{ route('pacientes.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
-        <i class="fas fa-plus"></i> Nuevo Paciente
+<div class="flex items-center justify-between mb-4">
+    <h1 class="text-xl lg:text-2xl font-bold text-gray-800">
+        <i class="fas fa-users text-blue-600 mr-2"></i>Pacientes
+    </h1>
+    <a href="{{ route('pacientes.create') }}"
+       class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 lg:px-4 rounded-lg text-sm font-medium flex items-center gap-2">
+        <i class="fas fa-plus"></i>
+        <span class="hidden sm:inline">Nuevo Paciente</span>
     </a>
 </div>
 
 {{-- Buscador --}}
-<form method="GET" class="bg-white p-4 rounded-xl shadow-sm mb-6 flex gap-3">
-    <input type="text" name="buscar" value="{{ request('buscar') }}" placeholder="Buscar por nombre, cédula, código u orden..."
-        class="input flex-1">
-    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700">
+<form method="GET" class="bg-white p-3 rounded-xl shadow-sm mb-4 flex gap-2">
+    <input type="text" name="buscar" value="{{ request('buscar') }}"
+        placeholder="Buscar nombre, cédula, código u orden..."
+        class="input flex-1 min-w-0">
+    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 flex-shrink-0">
         <i class="fas fa-search"></i>
     </button>
     @if(request('buscar'))
-    <a href="{{ route('ordenes.index') }}" class="text-gray-500 px-3 py-2 rounded-lg hover:bg-gray-100"><i class="fas fa-times"></i></a>
+    <a href="{{ route('ordenes.index') }}" class="text-gray-500 px-3 py-2 rounded-lg hover:bg-gray-100 flex-shrink-0">
+        <i class="fas fa-times"></i>
+    </a>
     @endif
 </form>
 
 {{-- Tabla --}}
-<div class="bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col" style="height: calc(100vh - 16rem);">
+<div class="bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col" style="height: calc(100vh - 14rem);">
     <div class="flex-1 overflow-auto">
         <table class="w-full text-xs border-collapse">
             <thead class="sticky top-0 z-10">
                 <tr class="bg-gray-700 text-white">
-                    <th class="px-2 py-2 text-left font-semibold border-r border-gray-600 w-20">Código</th>
+                    <th class="px-2 py-2 text-left font-semibold border-r border-gray-600 hidden sm:table-cell w-20">Código</th>
                     <th class="px-2 py-2 text-left font-semibold border-r border-gray-600">Nombre</th>
-                    <th class="px-2 py-2 text-left font-semibold border-r border-gray-600 w-24">Cédula</th>
-                    <th class="px-2 py-2 text-left font-semibold border-r border-gray-600 w-16">Edad/Sexo</th>
-                    <th class="px-2 py-2 text-left font-semibold border-r border-gray-600 w-28">Médico</th>
-                    <th class="px-2 py-2 text-left font-semibold border-r border-gray-600 w-24">Seguro</th>
-                    <th class="px-2 py-2 text-left font-semibold border-r border-gray-600 w-20">Última Orden</th>
-                    <th class="px-2 py-2 text-left font-semibold border-r border-gray-600 w-22">Fecha</th>
-                    <th class="px-2 py-2 text-left font-semibold border-r border-gray-600 w-24">Laboratorio</th>
-                    <th class="px-2 py-2 text-left font-semibold border-r border-gray-600 w-28">Dirección</th>
-                    <th class="px-2 py-2 text-left font-semibold border-r border-gray-600 w-24">Teléfono</th>
+                    <th class="px-2 py-2 text-left font-semibold border-r border-gray-600 hidden md:table-cell w-24">Cédula</th>
+                    <th class="px-2 py-2 text-left font-semibold border-r border-gray-600 hidden lg:table-cell w-16">Edad/Sexo</th>
+                    <th class="px-2 py-2 text-left font-semibold border-r border-gray-600 hidden xl:table-cell w-28">Médico</th>
+                    <th class="px-2 py-2 text-left font-semibold border-r border-gray-600 hidden xl:table-cell w-24">Seguro</th>
+                    <th class="px-2 py-2 text-left font-semibold border-r border-gray-600 w-20">Orden</th>
+                    <th class="px-2 py-2 text-left font-semibold border-r border-gray-600 hidden sm:table-cell w-22">Fecha</th>
+                    <th class="px-2 py-2 text-left font-semibold border-r border-gray-600 hidden lg:table-cell w-24">Lab.</th>
+                    <th class="px-2 py-2 text-left font-semibold border-r border-gray-600 hidden xl:table-cell w-28">Dirección</th>
+                    <th class="px-2 py-2 text-left font-semibold hidden xl:table-cell w-24">Teléfono</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($pacientes as $paciente)
                 @php $orden = $paciente->ordenes->first(); @endphp
-                <tr class="cursor-pointer border-b border-gray-100 {{ $loop->even ? 'bg-gray-50' : 'bg-white' }} hover:bg-blue-100"
+                <tr class="cursor-pointer border-b border-gray-100 {{ $loop->even ? 'bg-gray-50' : 'bg-white' }} hover:bg-blue-50 active:bg-blue-100"
                     @click="seleccionar({
                         id: {{ $paciente->id }},
                         nombre: '{{ addslashes(strtoupper($paciente->nombre)) }}',
@@ -61,17 +68,23 @@
                         urlEditar: '{{ route('pacientes.edit', $paciente) }}',
                         urlNuevaOrden: '{{ route('ordenes.create', ['paciente_id' => $paciente->id]) }}'
                     })">
-                    <td class="px-2 py-1.5 border-r border-gray-200 font-mono text-blue-600">{{ $paciente->codigo }}</td>
-                    <td class="px-2 py-1.5 border-r border-gray-200 font-medium text-gray-800 uppercase">{{ strtoupper($paciente->nombre) }}</td>
-                    <td class="px-2 py-1.5 border-r border-gray-200 text-gray-500">{{ $paciente->cedula ?? '—' }}</td>
-                    <td class="px-2 py-1.5 border-r border-gray-200 text-gray-500 text-center">{{ $paciente->edad ?? '—' }}{{ $paciente->edad ? 'a' : '' }} / {{ $paciente->sexo ?? '—' }}</td>
-                    <td class="px-2 py-1.5 border-r border-gray-200 text-gray-500 truncate">{{ $paciente->medico_tratante ?? '—' }}</td>
-                    <td class="px-2 py-1.5 border-r border-gray-200 text-gray-500 truncate">{{ $paciente->seguro_medico ?? '—' }}</td>
-                    <td class="px-2 py-1.5 border-r border-gray-200 font-mono text-blue-700">{{ $orden?->numero_orden ?? '—' }}</td>
-                    <td class="px-2 py-1.5 border-r border-gray-200 text-gray-600">{{ $orden?->fecha_entrada?->format('d-m-Y') ?? '—' }}</td>
-                    <td class="px-2 py-1.5 border-r border-gray-200 text-gray-400">{{ $paciente->laboratorio?->nombre ?? '—' }}</td>
-                    <td class="px-2 py-1.5 border-r border-gray-200 text-gray-400 truncate">{{ $paciente->direccion ?? '—' }}</td>
-                    <td class="px-2 py-1.5 border-r border-gray-200 text-gray-400">{{ $paciente->telefono ?? '—' }}</td>
+                    <td class="px-2 py-2 border-r border-gray-200 font-mono text-blue-600 hidden sm:table-cell">{{ $paciente->codigo }}</td>
+                    <td class="px-2 py-2 border-r border-gray-200 font-medium text-gray-800 uppercase">
+                        {{ strtoupper($paciente->nombre) }}
+                        {{-- En móvil muestra código debajo del nombre --}}
+                        <span class="sm:hidden block text-xs text-blue-500 font-mono font-normal">{{ $paciente->codigo }}</span>
+                    </td>
+                    <td class="px-2 py-2 border-r border-gray-200 text-gray-500 hidden md:table-cell">{{ $paciente->cedula ?? '—' }}</td>
+                    <td class="px-2 py-2 border-r border-gray-200 text-gray-500 text-center hidden lg:table-cell">{{ $paciente->edad ?? '—' }}{{ $paciente->edad ? 'a' : '' }} / {{ $paciente->sexo ?? '—' }}</td>
+                    <td class="px-2 py-2 border-r border-gray-200 text-gray-500 truncate hidden xl:table-cell">{{ $paciente->medico_tratante ?? '—' }}</td>
+                    <td class="px-2 py-2 border-r border-gray-200 text-gray-500 truncate hidden xl:table-cell">{{ $paciente->seguro_medico ?? '—' }}</td>
+                    <td class="px-2 py-2 border-r border-gray-200 font-mono text-blue-700">
+                        {{ $orden?->numero_orden ?? '—' }}
+                    </td>
+                    <td class="px-2 py-2 border-r border-gray-200 text-gray-600 hidden sm:table-cell">{{ $orden?->fecha_entrada?->format('d-m-Y') ?? '—' }}</td>
+                    <td class="px-2 py-2 border-r border-gray-200 text-gray-400 hidden lg:table-cell">{{ $paciente->laboratorio?->nombre ?? '—' }}</td>
+                    <td class="px-2 py-2 border-r border-gray-200 text-gray-400 truncate hidden xl:table-cell">{{ $paciente->direccion ?? '—' }}</td>
+                    <td class="px-2 py-2 text-gray-400 hidden xl:table-cell">{{ $paciente->telefono ?? '—' }}</td>
                 </tr>
                 @empty
                 <tr>
@@ -85,7 +98,7 @@
     </div>
 
     @if($pacientes->hasPages())
-    <div class="px-4 py-2 border-t border-gray-200 bg-gray-50 text-xs text-gray-500 flex items-center justify-between">
+    <div class="px-4 py-2 border-t border-gray-200 bg-gray-50 text-xs text-gray-500 flex items-center justify-between flex-wrap gap-2">
         <span>{{ $pacientes->total() }} pacientes</span>
         {{ $pacientes->appends(request()->query())->links() }}
     </div>
@@ -94,10 +107,14 @@
 
 {{-- Modal de opciones --}}
 <div x-show="modal" x-cloak
-    class="fixed inset-0 z-50 flex items-center justify-center"
+    class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
     @keydown.escape.window="modal = false">
     <div class="absolute inset-0 bg-black bg-opacity-40" @click="modal = false"></div>
-    <div class="relative bg-white rounded-2xl shadow-2xl w-80 overflow-hidden z-10">
+    <div class="relative bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl w-full sm:w-80 overflow-hidden z-10
+                transition-transform duration-200"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 translate-y-4"
+         x-transition:enter-end="opacity-100 translate-y-0">
         <div class="bg-blue-700 text-white px-5 py-4">
             <p class="text-xs text-blue-200 uppercase tracking-wider mb-0.5">Paciente seleccionado</p>
             <p class="font-bold text-base leading-tight" x-text="selected?.nombre"></p>
@@ -135,7 +152,7 @@
         </div>
         <div class="px-4 pb-4">
             <button @click="modal = false"
-                class="w-full py-2 text-xs text-gray-400 hover:text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50">
+                class="w-full py-2.5 text-xs text-gray-400 hover:text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50">
                 Cancelar
             </button>
         </div>
@@ -150,8 +167,4 @@
 @endforeach
 
 </div>
-
-@push('scripts')
-<script src="//unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-@endpush
 @endsection
