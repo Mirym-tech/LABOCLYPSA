@@ -50,18 +50,25 @@ class DatabaseSeeder extends Seeder
         );
         $admin->syncRoles(['admin']);
 
-        // withTrashed() para no chocar con el unique constraint si el usuario fue soft-deleted
-        $bio = User::withTrashed()->updateOrCreate(
-            ['email' => 'ysabel@laboclypsa.com'],
-            ['name' => 'Ysabel Pérez', 'password' => Hash::make('Bio1234!'), 'laboratorio_id' => $lab1->id, 'activo' => true, 'deleted_at' => null]
-        );
-        $bio->syncRoles(['bioanalista']);
-
-        $rec = User::withTrashed()->updateOrCreate(
-            ['email' => 'recepcion@laboclypsa.com'],
-            ['name' => 'Recepcionista', 'password' => Hash::make('Rec1234!'), 'laboratorio_id' => $lab1->id, 'activo' => true, 'deleted_at' => null]
-        );
-        $rec->syncRoles(['recepcionista']);
+        // Usuarios de demo: solo crear si NO existen (nunca sobreescribir datos existentes)
+        foreach ([
+            ['email' => 'ysabel@laboclypsa.com',    'name' => 'Ysabel Pérez',  'password' => 'Bio1234!', 'role' => 'bioanalista'],
+            ['email' => 'recepcion@laboclypsa.com', 'name' => 'Recepcionista', 'password' => 'Rec1234!', 'role' => 'recepcionista'],
+        ] as $demo) {
+            $u = User::withTrashed()->where('email', $demo['email'])->first();
+            if (!$u) {
+                $u = User::create([
+                    'email'          => $demo['email'],
+                    'name'           => $demo['name'],
+                    'password'       => Hash::make($demo['password']),
+                    'laboratorio_id' => $lab1->id,
+                    'activo'         => true,
+                ]);
+            } elseif ($u->trashed()) {
+                $u->restore();
+            }
+            $u->syncRoles([$demo['role']]);
+        }
 
         // ── Catálogo de Análisis ──────────────────────────────────────────────
         $catalogo = [
