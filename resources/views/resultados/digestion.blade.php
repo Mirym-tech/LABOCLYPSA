@@ -3,10 +3,10 @@
 
 @section('content')
 @php $r = $resultado; @endphp
-<div class="flex items-center gap-3 mb-5">
-    <a href="{{ route('ordenes.show', $oa->orden_id) }}" class="text-gray-400 hover:text-gray-600"><i class="fas fa-arrow-left"></i></a>
-    <h1 class="text-xl font-bold text-gray-800">Digestión en Heces — Orden <span class="text-blue-600 font-mono">{{ $oa->orden->numero_orden }}</span></h1>
-    <a href="{{ route('pdf.digestion', $oa) }}" target="_blank" class="ml-auto bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm"><i class="fas fa-print mr-1"></i>Imprimir Resultado</a>
+<div class="flex flex-wrap items-start gap-2 mb-5">
+    <a href="{{ route('ordenes.show', $oa->orden_id) }}" class="text-gray-400 hover:text-gray-600 mt-1 flex-shrink-0"><i class="fas fa-arrow-left"></i></a>
+    <h1 class="text-lg sm:text-xl font-bold text-gray-800 leading-tight min-w-0 flex-1">Digestión en Heces — Orden <span class="text-blue-600 font-mono">{{ $oa->orden->numero_orden }}</span></h1>
+    <a href="{{ route('pdf.digestion', $oa) }}" target="_blank" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm flex-shrink-0"><i class="fas fa-print mr-1"></i>Imprimir</a>
 </div>
 
 <form method="POST" action="{{ route('resultados.digestion.guardar', $oa) }}">
@@ -51,8 +51,9 @@
         <textarea name="observacion" rows="3" class="input w-full">{{ $r->observacion ?? '' }}</textarea>
     </div>
 
-    <div class="flex gap-3 border-t pt-4">
-        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-medium flex items-center gap-2">
+    <div class="sticky bottom-0 z-10 bg-white border-t border-gray-200 shadow-md
+                -mx-3 lg:-mx-6 px-3 lg:px-6 py-3 mt-2 flex gap-3">
+        <button type="submit" class="bg-blue-600 hover:bg-blue-700 active:bg-blue-900 text-white px-6 py-2.5 rounded-lg font-medium flex items-center gap-2">
             <i class="fas fa-save"></i> Grabar
         </button>
         <a href="{{ route('ordenes.show', $oa->orden_id) }}" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2.5 rounded-lg font-medium">Cancelar</a>

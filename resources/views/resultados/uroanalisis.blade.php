@@ -4,13 +4,13 @@
 @section('content')
 @php $paciente = $oa->orden->paciente; @endphp
 
-<div class="flex items-center gap-3 mb-4">
-    <a href="{{ route('ordenes.show', $oa->orden_id) }}" class="text-gray-400 hover:text-gray-600"><i class="fas fa-arrow-left"></i></a>
-    <div>
-        <h1 class="text-xl font-bold text-gray-800">Uroanálisis / Coprológico — Orden <span class="text-blue-600 font-mono">{{ $oa->orden->numero_orden }}</span></h1>
+<div class="flex flex-wrap items-start gap-2 mb-4">
+    <a href="{{ route('ordenes.show', $oa->orden_id) }}" class="text-gray-400 hover:text-gray-600 mt-1 flex-shrink-0"><i class="fas fa-arrow-left"></i></a>
+    <div class="min-w-0 flex-1">
+        <h1 class="text-lg sm:text-xl font-bold text-gray-800 leading-tight">Uroanálisis / Coprológico — Orden <span class="text-blue-600 font-mono">{{ $oa->orden->numero_orden }}</span></h1>
         <p class="text-sm text-gray-500">{{ $paciente->nombre }}</p>
     </div>
-    <div class="ml-auto flex gap-2">
+    <div class="flex gap-2 flex-wrap flex-shrink-0">
         <a href="{{ route('pdf.uroanalisis', $oa) }}" target="_blank" class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-sm"><i class="fas fa-print mr-1"></i>Imprimir Orina</a>
         <a href="{{ route('pdf.coprologia', $oa) }}" target="_blank" class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-sm"><i class="fas fa-print mr-1"></i>Imprimir Coprológico</a>
     </div>
@@ -125,8 +125,9 @@
 </div>
 </div>
 
-<div class="mt-5 flex gap-3">
-    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-medium flex items-center gap-2">
+<div class="sticky bottom-0 z-10 bg-white border-t border-gray-200 shadow-md
+            -mx-3 lg:-mx-6 px-3 lg:px-6 py-3 mt-4 flex gap-3">
+    <button type="submit" class="bg-blue-600 hover:bg-blue-700 active:bg-blue-900 text-white px-6 py-2.5 rounded-lg font-medium flex items-center gap-2">
         <i class="fas fa-save"></i> Grabar
     </button>
     <a href="{{ route('ordenes.show', $oa->orden_id) }}" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2.5 rounded-lg font-medium">Cancelar</a>

@@ -15,10 +15,10 @@ $grupos = [
 ];
 @endphp
 
-<div class="flex items-center gap-3 mb-5">
-    <a href="{{ route('ordenes.show', $oa->orden_id) }}" class="text-gray-400 hover:text-gray-600"><i class="fas fa-arrow-left"></i></a>
-    <div>
-        <h1 class="text-xl font-bold text-gray-800">Análisis Varios — Orden <span class="text-blue-600 font-mono">{{ $oa->orden->numero_orden }}</span></h1>
+<div class="flex flex-wrap items-start gap-2 mb-5">
+    <a href="{{ route('ordenes.show', $oa->orden_id) }}" class="text-gray-400 hover:text-gray-600 mt-1 flex-shrink-0"><i class="fas fa-arrow-left"></i></a>
+    <div class="min-w-0 flex-1">
+        <h1 class="text-lg sm:text-xl font-bold text-gray-800 leading-tight">Análisis Varios — Orden <span class="text-blue-600 font-mono">{{ $oa->orden->numero_orden }}</span></h1>
         <p class="text-sm text-gray-500">{{ $paciente->nombre }}</p>
     </div>
 </div>

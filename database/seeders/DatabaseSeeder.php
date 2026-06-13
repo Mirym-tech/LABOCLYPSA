@@ -50,16 +50,17 @@ class DatabaseSeeder extends Seeder
         );
         $admin->syncRoles(['admin']);
 
-        $bio = User::firstOrCreate(['email' => 'ysabel@laboclypsa.com'], [
-            'name' => 'Ysabel Pérez', 'password' => Hash::make('Bio1234!'),
-            'laboratorio_id' => $lab1->id, 'activo' => true,
-        ]);
+        // withTrashed() para no chocar con el unique constraint si el usuario fue soft-deleted
+        $bio = User::withTrashed()->updateOrCreate(
+            ['email' => 'ysabel@laboclypsa.com'],
+            ['name' => 'Ysabel Pérez', 'password' => Hash::make('Bio1234!'), 'laboratorio_id' => $lab1->id, 'activo' => true, 'deleted_at' => null]
+        );
         $bio->syncRoles(['bioanalista']);
 
-        $rec = User::firstOrCreate(['email' => 'recepcion@laboclypsa.com'], [
-            'name' => 'Recepcionista', 'password' => Hash::make('Rec1234!'),
-            'laboratorio_id' => $lab1->id, 'activo' => true,
-        ]);
+        $rec = User::withTrashed()->updateOrCreate(
+            ['email' => 'recepcion@laboclypsa.com'],
+            ['name' => 'Recepcionista', 'password' => Hash::make('Rec1234!'), 'laboratorio_id' => $lab1->id, 'activo' => true, 'deleted_at' => null]
+        );
         $rec->syncRoles(['recepcionista']);
 
         // ── Catálogo de Análisis ──────────────────────────────────────────────
