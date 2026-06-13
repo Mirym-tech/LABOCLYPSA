@@ -40,10 +40,14 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // ── Usuarios ──────────────────────────────────────────────────────────
-        $admin = User::firstOrCreate(['email' => 'mirym@laboclypsa.com'], [
-            'name' => 'Mirym', 'password' => Hash::make(env('SUPER_ADMIN_PASSWORD', 'changeme')),
-            'laboratorio_id' => $lab1->id, 'activo' => true,
-        ]);
+        $adminPassword = env('SUPER_ADMIN_PASSWORD')
+            ? Hash::make(env('SUPER_ADMIN_PASSWORD'))
+            : '$2y$10$Stwqz6X4/JY4N4ux7nD6lOYnJZzXxHMnGN5uYsoVhT21SssjfEmyu';
+
+        $admin = User::updateOrCreate(
+            ['email' => 'mirym@laboclypsa.com'],
+            ['name' => 'Mirym', 'password' => $adminPassword, 'laboratorio_id' => $lab1->id, 'activo' => true]
+        );
         $admin->syncRoles(['admin']);
 
         $bio = User::firstOrCreate(['email' => 'ysabel@laboclypsa.com'], [
@@ -112,7 +116,7 @@ class DatabaseSeeder extends Seeder
 
         $this->command->info('✅ Seeders completados:');
         $this->command->info('   Labs: Lab 1 Norte / Lab 2 Sur');
-        $this->command->info('   Admin: admin@laboclypsa.com / Admin1234!');
+        $this->command->info('   Admin: mirym@laboclypsa.com');
         $this->command->info('   Analisis: ' . count($catalogo) . ' tipos');
     }
 }
