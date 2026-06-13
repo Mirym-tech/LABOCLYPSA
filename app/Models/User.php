@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
@@ -10,7 +11,7 @@ use Spatie\Activitylog\Traits\CausesActivity;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, HasRoles, CausesActivity;
+    use HasFactory, Notifiable, HasRoles, CausesActivity, SoftDeletes;
 
     protected $fillable = ['name', 'email', 'password', 'laboratorio_id', 'activo'];
 
