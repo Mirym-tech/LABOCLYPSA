@@ -58,6 +58,7 @@ Route::middleware(['auth', 'forzar-lab'])->group(function () {
 
         Route::get('varios/{oa}',         [ResultadoController::class, 'varios'])->name('varios');
         Route::post('varios/{oa}',        [ResultadoController::class, 'guardarVarios'])->name('varios.guardar');
+        Route::put('varios/item/{resultado}',    [ResultadoController::class, 'actualizarVarios'])->name('varios.actualizar');
         Route::delete('varios/item/{resultado}', [ResultadoController::class, 'eliminarVarios'])->name('varios.eliminar');
     });
 

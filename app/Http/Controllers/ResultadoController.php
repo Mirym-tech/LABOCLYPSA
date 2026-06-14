@@ -233,6 +233,27 @@ class ResultadoController extends Controller
         return redirect()->route('ordenes.show', $oa->orden_id)->with('success', 'Análisis agregado.');
     }
 
+    public function actualizarVarios(Request $request, ResultadoVarios $resultado)
+    {
+        $resultado->loadMissing('ordenAnalisis');
+        $this->verificarAcceso($resultado->ordenAnalisis);
+
+        $validated = $request->validate([
+            'grupo'     => 'required|string|max:100',
+            'sub_grupo' => 'required|string|max:200',
+            'resultado' => 'nullable|string|max:500',
+            'valor_ref' => 'nullable|string|max:200',
+            'medidas'   => 'nullable|string|max:100',
+            'metodo'    => 'nullable|string|max:200',
+            'muestra'   => 'nullable|string|max:100',
+        ]);
+
+        $resultado->update($validated);
+
+        return redirect()->route('ordenes.show', $resultado->ordenAnalisis->orden_id)
+            ->with('success', 'Análisis actualizado correctamente.');
+    }
+
     public function eliminarVarios(ResultadoVarios $resultado)
     {
         $this->verificarAcceso($resultado->ordenAnalisis);
