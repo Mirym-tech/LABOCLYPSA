@@ -10,10 +10,6 @@
         <h1 class="text-lg sm:text-xl font-bold text-gray-800 leading-tight">Uroanálisis / Coprológico — Orden <span class="text-blue-600 font-mono">{{ $oa->orden->numero_orden }}</span></h1>
         <p class="text-sm text-gray-500">{{ $paciente->nombre }}</p>
     </div>
-    <div class="flex gap-2 flex-wrap flex-shrink-0">
-        <a href="{{ route('pdf.uroanalisis', $oa) }}" target="_blank" class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-sm"><i class="fas fa-print mr-1"></i>Imprimir Orina</a>
-        <a href="{{ route('pdf.coprologia', $oa) }}" target="_blank" class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-sm"><i class="fas fa-print mr-1"></i>Imprimir Coprológico</a>
-    </div>
 </div>
 
 <div x-data="{ tab: 'uro' }">
