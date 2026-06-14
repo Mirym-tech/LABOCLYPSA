@@ -67,22 +67,32 @@
         @php
             $ruta = match($oa->tipo->categoria) {
                 'HEMATOLOGIA', 'HEMATO/COAGULACION' => route('resultados.hematologia', $oa),
-                'BACTERIOLOGIA' => route('resultados.bacteriologia', $oa),
-                'ANTIGENOS', 'SEROLOGIA' => route('resultados.serologia', $oa),
-                'ANALISIS DE COLERA' => route('resultados.colera', $oa),
-                'UROANALISIS' => route('resultados.uroanalisis', $oa),
-                'DIGESTION EN HECES' => route('resultados.digestion', $oa),
-                'ANALISIS VARIOS' => route('resultados.varios', $oa),
+                'BACTERIOLOGIA'                      => route('resultados.bacteriologia', $oa),
+                'ANTIGENOS', 'SEROLOGIA'             => route('resultados.serologia', $oa),
+                'ANALISIS DE COLERA'                 => route('resultados.colera', $oa),
+                'UROANALISIS'                        => route('resultados.uroanalisis', $oa),
+                'DIGESTION EN HECES'                 => route('resultados.digestion', $oa),
+                'ANALISIS VARIOS'                    => route('resultados.varios', $oa),
                 default => null,
             };
             $pdfRuta = match($oa->tipo->categoria) {
                 'HEMATOLOGIA', 'HEMATO/COAGULACION' => route('pdf.hematologia', $oa),
-                'BACTERIOLOGIA' => route('pdf.bacteriologia', $oa),
-                'ANALISIS DE COLERA' => route('pdf.colera', $oa),
-                'UROANALISIS' => route('pdf.uroanalisis', $oa),
-                'DIGESTION EN HECES' => route('pdf.digestion', $oa),
-                'ANALISIS VARIOS' => route('pdf.varios', $oa),
+                'BACTERIOLOGIA'                      => route('pdf.bacteriologia', $oa),
+                'ANALISIS DE COLERA'                 => route('pdf.colera', $oa),
+                'UROANALISIS'                        => route('pdf.uroanalisis', $oa),
+                'DIGESTION EN HECES'                 => route('pdf.digestion', $oa),
+                'ANALISIS VARIOS'                    => route('pdf.varios', $oa),
                 default => null,
+            };
+            $tieneResultado = match($oa->tipo->categoria) {
+                'HEMATOLOGIA', 'HEMATO/COAGULACION' => $oa->resultadoHematologia !== null,
+                'BACTERIOLOGIA'                      => $oa->resultadoBacteriologia !== null,
+                'ANTIGENOS', 'SEROLOGIA'             => $oa->resultadoSerologia !== null,
+                'ANALISIS DE COLERA'                 => $oa->resultadoColera !== null,
+                'UROANALISIS'                        => $oa->resultadoUroanalisis !== null || $oa->resultadoCoprologia !== null,
+                'DIGESTION EN HECES'                 => $oa->resultadoDigestion !== null,
+                'ANALISIS VARIOS'                    => $oa->resultadoVarios->isNotEmpty(),
+                default                              => false,
             };
             $coloresEstado = ['pendiente'=>'yellow','en_proceso'=>'blue','listo'=>'green'];
             $ce = $coloresEstado[$oa->estado] ?? 'gray';
@@ -98,9 +108,15 @@
             </div>
             <div class="flex items-center gap-2 flex-shrink-0">
                 @if($ruta)
-                    <a href="{{ $ruta }}" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-xs font-medium">
-                        <i class="fas fa-edit mr-1"></i>Ingresar
-                    </a>
+                    @if($tieneResultado)
+                        <a href="{{ $ruta }}" class="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg text-xs font-medium">
+                            <i class="fas fa-edit mr-1"></i>Editar
+                        </a>
+                    @else
+                        <a href="{{ $ruta }}" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-xs font-medium">
+                            <i class="fas fa-plus-circle mr-1"></i>Ingresar
+                        </a>
+                    @endif
                 @endif
                 @if($pdfRuta && $oa->estado === 'listo')
                     <a href="{{ $pdfRuta }}" target="_blank" class="text-red-500 hover:text-red-700">
@@ -128,22 +144,32 @@
             @php
                 $ruta = match($oa->tipo->categoria) {
                     'HEMATOLOGIA', 'HEMATO/COAGULACION' => route('resultados.hematologia', $oa),
-                    'BACTERIOLOGIA' => route('resultados.bacteriologia', $oa),
-                    'ANTIGENOS', 'SEROLOGIA' => route('resultados.serologia', $oa),
-                    'ANALISIS DE COLERA' => route('resultados.colera', $oa),
-                    'UROANALISIS' => route('resultados.uroanalisis', $oa),
-                    'DIGESTION EN HECES' => route('resultados.digestion', $oa),
-                    'ANALISIS VARIOS' => route('resultados.varios', $oa),
+                    'BACTERIOLOGIA'                      => route('resultados.bacteriologia', $oa),
+                    'ANTIGENOS', 'SEROLOGIA'             => route('resultados.serologia', $oa),
+                    'ANALISIS DE COLERA'                 => route('resultados.colera', $oa),
+                    'UROANALISIS'                        => route('resultados.uroanalisis', $oa),
+                    'DIGESTION EN HECES'                 => route('resultados.digestion', $oa),
+                    'ANALISIS VARIOS'                    => route('resultados.varios', $oa),
                     default => null,
                 };
                 $pdfRuta = match($oa->tipo->categoria) {
                     'HEMATOLOGIA', 'HEMATO/COAGULACION' => route('pdf.hematologia', $oa),
-                    'BACTERIOLOGIA' => route('pdf.bacteriologia', $oa),
-                    'ANALISIS DE COLERA' => route('pdf.colera', $oa),
-                    'UROANALISIS' => route('pdf.uroanalisis', $oa),
-                    'DIGESTION EN HECES' => route('pdf.digestion', $oa),
-                    'ANALISIS VARIOS' => route('pdf.varios', $oa),
+                    'BACTERIOLOGIA'                      => route('pdf.bacteriologia', $oa),
+                    'ANALISIS DE COLERA'                 => route('pdf.colera', $oa),
+                    'UROANALISIS'                        => route('pdf.uroanalisis', $oa),
+                    'DIGESTION EN HECES'                 => route('pdf.digestion', $oa),
+                    'ANALISIS VARIOS'                    => route('pdf.varios', $oa),
                     default => null,
+                };
+                $tieneResultado = match($oa->tipo->categoria) {
+                    'HEMATOLOGIA', 'HEMATO/COAGULACION' => $oa->resultadoHematologia !== null,
+                    'BACTERIOLOGIA'                      => $oa->resultadoBacteriologia !== null,
+                    'ANTIGENOS', 'SEROLOGIA'             => $oa->resultadoSerologia !== null,
+                    'ANALISIS DE COLERA'                 => $oa->resultadoColera !== null,
+                    'UROANALISIS'                        => $oa->resultadoUroanalisis !== null || $oa->resultadoCoprologia !== null,
+                    'DIGESTION EN HECES'                 => $oa->resultadoDigestion !== null,
+                    'ANALISIS VARIOS'                    => $oa->resultadoVarios->isNotEmpty(),
+                    default                              => false,
                 };
                 $coloresEstado = ['pendiente'=>'yellow','en_proceso'=>'blue','listo'=>'green'];
                 $ce = $coloresEstado[$oa->estado] ?? 'gray';
@@ -161,17 +187,27 @@
                 </td>
                 <td class="px-4 py-3 text-center">
                     @if($ruta)
-                        <a href="{{ $ruta }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                            <i class="fas fa-edit mr-1"></i>Ingresar
-                        </a>
-                    @else<span class="text-gray-300">—</span>@endif
+                        @if($tieneResultado)
+                            <a href="{{ $ruta }}" class="text-green-600 hover:text-green-800 text-sm font-medium">
+                                <i class="fas fa-edit mr-1"></i>Editar
+                            </a>
+                        @else
+                            <a href="{{ $ruta }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                <i class="fas fa-plus-circle mr-1"></i>Ingresar
+                            </a>
+                        @endif
+                    @else
+                        <span class="text-gray-300">—</span>
+                    @endif
                 </td>
                 <td class="px-4 py-3 text-center">
                     @if($pdfRuta && $oa->estado === 'listo')
                         <a href="{{ $pdfRuta }}" target="_blank" class="text-red-500 hover:text-red-700">
                             <i class="fas fa-file-pdf text-lg"></i>
                         </a>
-                    @else<span class="text-gray-200"><i class="fas fa-file-pdf"></i></span>@endif
+                    @else
+                        <span class="text-gray-200"><i class="fas fa-file-pdf"></i></span>
+                    @endif
                 </td>
             </tr>
         @endforeach

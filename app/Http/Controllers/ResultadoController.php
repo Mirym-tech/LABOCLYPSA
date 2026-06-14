@@ -230,7 +230,7 @@ class ResultadoController extends Controller
 
         ResultadoVarios::create($validated);
         $oa->update(['estado' => 'listo']);
-        return back()->with('success', 'Análisis agregado.');
+        return redirect()->route('ordenes.show', $oa->orden_id)->with('success', 'Análisis agregado.');
     }
 
     public function eliminarVarios(ResultadoVarios $resultado)
