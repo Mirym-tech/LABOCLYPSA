@@ -20,6 +20,12 @@
     </form>
     @endrole
     @endif
+    @if($orden->analisis->where('estado', 'listo')->isNotEmpty())
+    <a href="{{ route('pdf.orden', $orden) }}" target="_blank"
+       class="flex-shrink-0 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
+        <i class="fas fa-file-pdf"></i> <span class="hidden xs:inline">Imprimir Todo</span><span class="xs:hidden"><i class="fas fa-print"></i></span>
+    </a>
+    @endif
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
@@ -79,7 +85,9 @@
                 'HEMATOLOGIA', 'HEMATO/COAGULACION' => route('pdf.hematologia', $oa),
                 'BACTERIOLOGIA'                      => route('pdf.bacteriologia', $oa),
                 'ANALISIS DE COLERA'                 => route('pdf.colera', $oa),
-                'UROANALISIS'                        => route('pdf.uroanalisis', $oa),
+                'UROANALISIS' => str_contains(strtolower($oa->tipo->nombre ?? ''), 'coprol')
+                                     ? route('pdf.coprologia', $oa)
+                                     : route('pdf.uroanalisis', $oa),
                 'DIGESTION EN HECES'                 => route('pdf.digestion', $oa),
                 'ANALISIS VARIOS'                    => route('pdf.varios', $oa),
                 default => null,
@@ -156,7 +164,9 @@
                     'HEMATOLOGIA', 'HEMATO/COAGULACION' => route('pdf.hematologia', $oa),
                     'BACTERIOLOGIA'                      => route('pdf.bacteriologia', $oa),
                     'ANALISIS DE COLERA'                 => route('pdf.colera', $oa),
-                    'UROANALISIS'                        => route('pdf.uroanalisis', $oa),
+                    'UROANALISIS' => str_contains(strtolower($oa->tipo->nombre ?? ''), 'coprol')
+                                     ? route('pdf.coprologia', $oa)
+                                     : route('pdf.uroanalisis', $oa),
                     'DIGESTION EN HECES'                 => route('pdf.digestion', $oa),
                     'ANALISIS VARIOS'                    => route('pdf.varios', $oa),
                     default => null,

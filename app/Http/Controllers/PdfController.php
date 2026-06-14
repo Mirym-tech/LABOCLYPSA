@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Orden;
 use App\Models\OrdenAnalisis;
 use Barryvdh\DomPDF\Facade\Pdf;
 
@@ -67,5 +68,23 @@ class PdfController extends Controller
         $oa->load(['orden.paciente', 'orden.laboratorio', 'resultadoVarios.bioanalista']);
         $pdf = Pdf::loadView('pdf.varios', compact('oa'))->setPaper('letter', 'portrait');
         return $pdf->stream('varios_' . $oa->orden->numero_orden . '.pdf');
+    }
+
+    public function ordenCompleta(Orden $orden)
+    {
+        $orden->load([
+            'paciente', 'laboratorio',
+            'analisis.tipo',
+            'analisis.resultadoHematologia.bioanalista',
+            'analisis.resultadoBacteriologia.bioanalista',
+            'analisis.resultadoSerologia.bioanalista',
+            'analisis.resultadoColera.bioanalista',
+            'analisis.resultadoUroanalisis.bioanalista',
+            'analisis.resultadoCoprologia.bioanalista',
+            'analisis.resultadoDigestion.bioanalista',
+            'analisis.resultadoVarios.bioanalista',
+        ]);
+        $pdf = Pdf::loadView('pdf.orden_completa', compact('orden'))->setPaper('letter', 'portrait');
+        return $pdf->stream('resultados_' . $orden->numero_orden . '.pdf');
     }
 }
