@@ -79,6 +79,7 @@ Route::middleware(['auth', 'forzar-lab'])->group(function () {
 
     // Gestión de usuarios — solo mirym@laboclypsa.com
     Route::middleware(['role:admin', 'superadmin'])->group(function () {
+        Route::post('usuarios/{id}/restaurar', [UsuarioController::class, 'restore'])->name('usuarios.restore');
         Route::resource('usuarios', UsuarioController::class)->except(['show']);
     });
 });

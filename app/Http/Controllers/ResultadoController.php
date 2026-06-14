@@ -34,18 +34,20 @@ class ResultadoController extends Controller
         // Admin siempre pasa (doble chequeo: rol + email por si hay caché stale)
         if ($user->hasRole('admin') || $user->email === 'mirym@laboclypsa.com') return;
 
-        $oa->loadMissing('orden');
+        $oa->loadMissing('orden.laboratorio');
 
-        // Pasa si la orden es de su laboratorio asignado
-        if ($oa->orden->laboratorio_id === $user->laboratorio_id) return;
+        // Pasa si la orden es del laboratorio asignado al usuario (comparación no estricta para evitar int/string mismatch)
+        if ($user->laboratorio_id !== null && (int) $oa->orden->laboratorio_id === (int) $user->laboratorio_id) return;
 
-        // Pasa si el usuario mismo creó la orden (aunque sea de otro lab)
-        if ($oa->orden->creado_por === $user->id) return;
+        // Pasa si el usuario mismo creó la orden
+        if ((int) $oa->orden->creado_por === (int) $user->id) return;
 
-        // Redirigir con mensaje en lugar de pantalla 403 vacía
+        $labOrden   = $oa->orden->laboratorio?->nombre ?? "ID {$oa->orden->laboratorio_id}";
+        $labUsuario = $user->laboratorio?->nombre       ?? ($user->laboratorio_id ? "ID {$user->laboratorio_id}" : 'sin laboratorio asignado');
+
         throw new \Illuminate\Http\Exceptions\HttpResponseException(
             redirect()->route('ordenes.show', $oa->orden_id)
-                ->with('error', 'No tienes acceso a resultados de este laboratorio. Pide al administrador que actualice tu laboratorio asignado.')
+                ->with('error', "No tienes acceso: la orden pertenece a «{$labOrden}» y tú estás asignado/a a «{$labUsuario}». Pide al administrador que corrija tu laboratorio.")
         );
     }
 

@@ -44,15 +44,20 @@
             <a href="{{ route('usuarios.index') }}" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-2.5 rounded-lg font-medium">Cancelar</a>
         </div>
         @if($usuario->id !== auth()->id())
-        <form method="POST" action="{{ route('usuarios.destroy', $usuario) }}"
-              onsubmit="return confirm('¿Eliminar al usuario {{ addslashes($usuario->name) }}? Esta acción no se puede deshacer.')">
-            @csrf @method('DELETE')
-            <button type="submit" class="bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-800 px-4 py-2.5 rounded-lg font-medium flex items-center gap-2 text-sm">
-                <i class="fas fa-trash"></i> Eliminar usuario
-            </button>
-        </form>
+        <button type="button" form="form-eliminar-{{ $usuario->id }}"
+                onclick="if(confirm('¿Eliminar al usuario {{ addslashes($usuario->name) }}? Esta acción no se puede deshacer.')) document.getElementById('form-eliminar-{{ $usuario->id }}').submit()"
+                class="bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-800 px-4 py-2.5 rounded-lg font-medium flex items-center gap-2 text-sm">
+            <i class="fas fa-trash"></i> Eliminar usuario
+        </button>
         @endif
     </div>
 </div>
 </form>
+
+{{-- Form de eliminar FUERA del form de edición para evitar forms anidados --}}
+@if($usuario->id !== auth()->id())
+<form id="form-eliminar-{{ $usuario->id }}" method="POST" action="{{ route('usuarios.destroy', $usuario) }}" class="hidden">
+    @csrf @method('DELETE')
+</form>
+@endif
 @endsection

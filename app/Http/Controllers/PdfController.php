@@ -15,9 +15,9 @@ class PdfController extends Controller
 
         $oa->loadMissing('orden');
 
-        if ($oa->orden->laboratorio_id === $user->laboratorio_id) return;
+        if ($user->laboratorio_id !== null && (int) $oa->orden->laboratorio_id === (int) $user->laboratorio_id) return;
 
-        if ($oa->orden->creado_por === $user->id) return;
+        if ((int) $oa->orden->creado_por === (int) $user->id) return;
 
         throw new \Illuminate\Http\Exceptions\HttpResponseException(
             redirect()->route('ordenes.show', $oa->orden_id)
