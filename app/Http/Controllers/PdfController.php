@@ -54,6 +54,14 @@ class PdfController extends Controller
         return $pdf->stream('coprologia_' . $oa->orden->numero_orden . '.pdf');
     }
 
+    public function serologia(OrdenAnalisis $oa)
+    {
+        $this->verificarAcceso($oa);
+        $oa->load(['orden.paciente', 'orden.laboratorio', 'resultadoSerologia.bioanalista']);
+        $pdf = Pdf::loadView('pdf.serologia', compact('oa'))->setPaper('letter', 'portrait');
+        return $pdf->stream('serologia_' . $oa->orden->numero_orden . '.pdf');
+    }
+
     public function digestion(OrdenAnalisis $oa)
     {
         $this->verificarAcceso($oa);

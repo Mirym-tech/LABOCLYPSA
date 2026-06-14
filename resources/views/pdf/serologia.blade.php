@@ -7,7 +7,6 @@
 body { font-family: DejaVu Sans, Arial, sans-serif; font-size: 9.5px; color: #000; }
 .header { display:table; width:100%; padding: 6px 10px 4px; border-bottom: 2px solid #000; }
 .header-logo { display:table-cell; width:70px; vertical-align:middle; text-align:center; }
-.logo-circle { border: 2px solid #1a3a8a; border-radius: 50%; width: 55px; height: 55px; line-height: 55px; text-align:center; font-size:22px; color:#1a3a8a; display:inline-block; }
 .header-info { display:table-cell; vertical-align:middle; padding-left:8px; }
 .lab-name { font-size:18px; font-weight:bold; color:#000; letter-spacing:1px; }
 .lab-subtitle { font-size:11px; font-weight:bold; color:#1a3a8a; text-transform:uppercase; }
@@ -23,11 +22,6 @@ body { font-family: DejaVu Sans, Arial, sans-serif; font-size: 9.5px; color: #00
 .datos-cell-right { display:table-cell; padding: 2px 6px; width:50%; font-size:9px; border-left: 1px solid #999; }
 .datos-valor { font-weight:bold; }
 .section-header { background:#e8e8e8; font-weight:bold; font-size:8.5px; text-align:center; padding:2px; text-transform:uppercase; letter-spacing:1px; border-bottom:1px solid #000; }
-.res-table { width:100%; border-collapse:collapse; margin: 0 10px; width:calc(100% - 20px); }
-.res-table th { background:#e0e0e0; font-size:8.5px; font-weight:bold; padding:2px 6px; border:1px solid #999; text-align:left; }
-.res-table td { padding:2px 6px; font-size:9px; border:1px solid #ddd; }
-.res-table td:first-child { font-weight:bold; width:38%; }
-.res-table td:nth-child(2) { font-weight:bold; width:18%; }
 .obs-box { margin: 6px 10px; border: 1px solid #000; padding: 4px 8px; min-height: 35px; font-size:9px; }
 .obs-label { font-weight:bold; margin-bottom:2px; }
 .firmas { margin: 10px 10px 4px; display:table; width: calc(100% - 20px); }
@@ -40,9 +34,24 @@ body { font-family: DejaVu Sans, Arial, sans-serif; font-size: 9.5px; color: #00
 </head>
 <body>
 @php
-    $r = $oa->resultadoHematologia;
+    $r = $oa->resultadoSerologia;
     $o = $oa->orden;
     $p = $o->paciente;
+    $parametros = [
+        'salmonella_o_a'      => 'Salmonella O Grupo A',
+        'salmonella_o_b'      => 'Salmonella O Grupo B',
+        'salmonella_o_c'      => 'Salmonella O Grupo C',
+        'salmonella_o_d'      => 'Salmonella O Grupo D',
+        'salmonella_h_a'      => 'Salmonella H Grupo A',
+        'salmonella_h_b'      => 'Salmonella H Grupo B',
+        'salmonella_h_c'      => 'Salmonella H Grupo C',
+        'salmonella_h_d'      => 'Salmonella H Grupo D',
+        'proteus_ox2'         => 'Proteus OX 2',
+        'proteus_ox19'        => 'Proteus OX 19',
+        'proteus_oxk'         => 'Proteus OX K',
+        'brucella_abortus'    => 'Brucella Abortus',
+        'typhoide_o_somatica' => 'Typhoide O Somática',
+    ];
 @endphp
 
 <div class="header">
@@ -60,7 +69,7 @@ body { font-family: DejaVu Sans, Arial, sans-serif; font-size: 9.5px; color: #00
 
 <div class="titulo">
     <div class="titulo-sub">RESULTADO ANÁLISIS CLÍNICO</div>
-    <div class="titulo-tipo">HEMATOLOGÍA</div>
+    <div class="titulo-tipo">{{ strtoupper($oa->tipo->nombre) }}</div>
 </div>
 
 <div class="datos-paciente">
@@ -82,48 +91,23 @@ body { font-family: DejaVu Sans, Arial, sans-serif; font-size: 9.5px; color: #00
     </div>
 </div>
 
-<div class="section-header" style="margin: 4px 10px 0;">Hemograma Completo (CBC)</div>
-@php
-$params = [
-    ['label'=>'WBC',    'field'=>'wbc',    'unit'=>'10³/UL', 'ref'=>'4.0 – 10.0'],
-    ['label'=>'Lymph#', 'field'=>'lymph_abs','unit'=>'10³/UL','ref'=>'0.60 – 4.10'],
-    ['label'=>'Mid#',   'field'=>'mid_abs',  'unit'=>'10³/UL','ref'=>'0.10 – 0.90'],
-    ['label'=>'Gran#',  'field'=>'gran_abs', 'unit'=>'10³/UL','ref'=>'2.00 – 7.80'],
-    ['label'=>'Lymph%', 'field'=>'lymph_pct','unit'=>'%',     'ref'=>'20.0 – 50.0'],
-    ['label'=>'Mid%',   'field'=>'mid_pct',  'unit'=>'%',     'ref'=>'3.0 – 10.0'],
-    ['label'=>'Gran%',  'field'=>'gran_pct', 'unit'=>'%',     'ref'=>'40.0 – 70.0'],
-    ['label'=>'RBC',    'field'=>'rbc',      'unit'=>'10⁶/UL','ref'=>'3.80 – 5.80'],
-    ['label'=>'HGB',    'field'=>'hgb',      'unit'=>'g/dL',  'ref'=>'11.0 – 16.5'],
-    ['label'=>'HCT',    'field'=>'hct',      'unit'=>'%',     'ref'=>'35.0 – 50.0'],
-    ['label'=>'MCV',    'field'=>'mcv',      'unit'=>'fL',    'ref'=>'80.0 – 100.0'],
-    ['label'=>'MCH',    'field'=>'mch',      'unit'=>'pg',    'ref'=>'26.5 – 33.5'],
-    ['label'=>'MCHC',   'field'=>'mchc',     'unit'=>'g/dL',  'ref'=>'32.2 – 36.0'],
-    ['label'=>'RDW-CV', 'field'=>'rdw_cv',   'unit'=>'%',     'ref'=>'10.0 – 15.0'],
-    ['label'=>'RDW-SD', 'field'=>'rdw_sd',   'unit'=>'fL',    'ref'=>'35.0 – 56.0'],
-    ['label'=>'PLT',    'field'=>'plt',      'unit'=>'10³/UL','ref'=>'150 – 450'],
-    ['label'=>'MPV',    'field'=>'mpv',      'unit'=>'fL',    'ref'=>'7.0 – 11.0'],
-    ['label'=>'PDW',    'field'=>'pdw',      'unit'=>'%',     'ref'=>'10.0 – 18.0'],
-    ['label'=>'PCT',    'field'=>'pct',      'unit'=>'%',     'ref'=>'0.100 – 0.500'],
-    ['label'=>'P-LCR',  'field'=>'plcr',     'unit'=>'%',     'ref'=>'13.0 – 43.0'],
-];
-@endphp
-<table class="res-table" style="margin:0 10px; width:calc(100% - 20px); border:1px solid #000;">
-    <tr>
-        <th>Parámetro</th><th>Resultado</th><th>Unidad</th><th>Valor de Referencia</th>
+<div class="section-header" style="margin: 4px 10px 0;">Resultados</div>
+<table style="width:calc(100% - 20px); margin:0 10px; border-collapse:collapse; border:1px solid #000; border-top:none;">
+    <tr style="background:#f5f5f5;">
+        <th style="padding:2px 6px; font-size:8.5px; text-align:left; border-bottom:1px solid #999; border-right:1px solid #999; width:55%;">Parámetro</th>
+        <th style="padding:2px 6px; font-size:8.5px; text-align:center; border-bottom:1px solid #999;">Resultado</th>
     </tr>
-    @foreach($params as $param)
+    @foreach($parametros as $campo => $etiqueta)
     <tr>
-        <td>{{ $param['label'] }}</td>
-        <td>{{ $r?->{$param['field']} ?? '—' }}</td>
-        <td style="color:#555">{{ $param['unit'] }}</td>
-        <td style="color:#777">{{ $param['ref'] }}</td>
+        <td style="padding:2px 8px; font-size:9px; border-bottom:1px solid #ddd; border-right:1px solid #999; font-weight:bold;">{{ $etiqueta }}</td>
+        <td style="padding:2px 8px; font-size:9px; border-bottom:1px solid #ddd; font-weight:bold; text-align:center;">{{ strtoupper($r?->$campo ?? 'NEGATIVO') }}</td>
     </tr>
     @endforeach
 </table>
 
 <div class="obs-box" style="margin-top:6px;">
     <div class="obs-label">OBSERVACIÓN:</div>
-    <div style="margin-top:4px;">{{ $r->observacion_general ?? '' }}</div>
+    <div style="margin-top:4px;">{{ $r?->observacion ?? '' }}</div>
 </div>
 
 <div class="firmas">
@@ -136,7 +120,7 @@ $params = [
 </div>
 
 <div class="footer">
-    <div class="footer-cell">Creó: {{ $r->bioanalista?->name ?? auth()->user()?->name }}</div>
+    <div class="footer-cell">Creó: {{ $r?->bioanalista?->name ?? auth()->user()?->name }}</div>
     <div class="footer-cell-right">Imprimió: {{ auth()->user()?->name }} &nbsp; {{ now()->format('g:iA') }}</div>
 </div>
 

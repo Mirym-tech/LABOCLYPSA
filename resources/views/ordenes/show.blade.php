@@ -95,6 +95,7 @@
             $pdfRuta = match($oa->tipo->categoria) {
                 'HEMATOLOGIA', 'HEMATO/COAGULACION' => route('pdf.hematologia', $oa),
                 'BACTERIOLOGIA'                      => route('pdf.bacteriologia', $oa),
+                'ANTIGENOS', 'SEROLOGIA'             => route('pdf.serologia', $oa),
                 'ANALISIS DE COLERA'                 => route('pdf.colera', $oa),
                 'UROANALISIS' => str_contains(strtolower($oa->tipo->nombre ?? ''), 'coprol')
                                      ? route('pdf.coprologia', $oa)
@@ -174,6 +175,7 @@
                 $pdfRuta = match($oa->tipo->categoria) {
                     'HEMATOLOGIA', 'HEMATO/COAGULACION' => route('pdf.hematologia', $oa),
                     'BACTERIOLOGIA'                      => route('pdf.bacteriologia', $oa),
+                    'ANTIGENOS', 'SEROLOGIA'             => route('pdf.serologia', $oa),
                     'ANALISIS DE COLERA'                 => route('pdf.colera', $oa),
                     'UROANALISIS' => str_contains(strtolower($oa->tipo->nombre ?? ''), 'coprol')
                                      ? route('pdf.coprologia', $oa)

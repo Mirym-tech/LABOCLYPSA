@@ -205,6 +205,44 @@ body { font-family: DejaVu Sans, Arial, sans-serif; font-size: 9.5px; color: #00
     <div style="margin-top:4px;">{{ $r?->observacion ?? '' }}</div>
 </div>
 
+@elseif($cat === 'ANTIGENOS' || $cat === 'SEROLOGIA')
+@php
+    $r = $oa->resultadoSerologia;
+    $creador = $r?->bioanalista?->name ?? $creador;
+    $parametros = [
+        'salmonella_o_a'      => 'Salmonella O Grupo A',
+        'salmonella_o_b'      => 'Salmonella O Grupo B',
+        'salmonella_o_c'      => 'Salmonella O Grupo C',
+        'salmonella_o_d'      => 'Salmonella O Grupo D',
+        'salmonella_h_a'      => 'Salmonella H Grupo A',
+        'salmonella_h_b'      => 'Salmonella H Grupo B',
+        'salmonella_h_c'      => 'Salmonella H Grupo C',
+        'salmonella_h_d'      => 'Salmonella H Grupo D',
+        'proteus_ox2'         => 'Proteus OX 2',
+        'proteus_ox19'        => 'Proteus OX 19',
+        'proteus_oxk'         => 'Proteus OX K',
+        'brucella_abortus'    => 'Brucella Abortus',
+        'typhoide_o_somatica' => 'Typhoide O Somática',
+    ];
+@endphp
+<div class="section-header" style="margin: 4px 10px 0;">Resultados</div>
+<table style="width:calc(100% - 20px); margin:0 10px; border-collapse:collapse; border:1px solid #000; border-top:none;">
+    <tr style="background:#f5f5f5;">
+        <th style="padding:2px 6px; font-size:8.5px; text-align:left; border-bottom:1px solid #999; border-right:1px solid #999; width:55%;">Parámetro</th>
+        <th style="padding:2px 6px; font-size:8.5px; text-align:center; border-bottom:1px solid #999;">Resultado</th>
+    </tr>
+    @foreach($parametros as $campo => $etiqueta)
+    <tr>
+        <td style="padding:2px 8px; font-size:9px; border-bottom:1px solid #ddd; border-right:1px solid #999; font-weight:bold;">{{ $etiqueta }}</td>
+        <td style="padding:2px 8px; font-size:9px; border-bottom:1px solid #ddd; font-weight:bold; text-align:center;">{{ strtoupper($r?->$campo ?? 'NEGATIVO') }}</td>
+    </tr>
+    @endforeach
+</table>
+<div class="obs-box" style="margin-top:6px;">
+    <div class="obs-label">OBSERVACIÓN:</div>
+    <div style="margin-top:4px;">{{ $r?->observacion ?? '' }}</div>
+</div>
+
 @elseif($cat === 'ANALISIS DE COLERA')
 @php
     $r = $oa->resultadoColera;

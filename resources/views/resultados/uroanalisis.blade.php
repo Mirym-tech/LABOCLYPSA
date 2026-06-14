@@ -34,15 +34,17 @@ $titulo     = $ambos ? 'Uroanálisis / Coprológico' : ($esCopro ? 'Coprológico
 <form method="POST" action="{{ route('resultados.uroanalisis.guardar', $oa) }}">
 @csrf
 
-{{-- Bioanalista común --}}
-<div class="bg-white rounded-xl shadow-sm p-4 mb-4">
+{{-- Bioanalista común: se aplica a ambos registros --}}
+<div class="bg-white rounded-xl shadow-sm p-4 mb-4" x-data="{ bioId: '{{ $uro->bioanalista_id ?? $cop->bioanalista_id ?? '' }}' }">
     <label class="label">Bioanalista</label>
-    <select name="uro[bioanalista_id]" class="input w-56">
+    <select x-model="bioId" class="input w-56">
         <option value="">— Seleccionar —</option>
         @foreach($bioanalistas as $bio)
-            <option value="{{ $bio->id }}" {{ ($uro->bioanalista_id ?? '') == $bio->id ? 'selected' : '' }}>{{ $bio->name }}</option>
+            <option value="{{ $bio->id }}">{{ $bio->name }}</option>
         @endforeach
     </select>
+    <input type="hidden" name="uro[bioanalista_id]" :value="bioId">
+    <input type="hidden" name="cop[bioanalista_id]" :value="bioId">
 </div>
 
 {{-- Tab Uroanálisis --}}

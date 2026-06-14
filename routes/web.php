@@ -70,6 +70,7 @@ Route::middleware(['auth', 'forzar-lab'])->group(function () {
         Route::get('colera/{oa}',        [PdfController::class, 'colera'])->name('colera');
         Route::get('uroanalisis/{oa}',   [PdfController::class, 'uroanalisis'])->name('uroanalisis');
         Route::get('coprologia/{oa}',    [PdfController::class, 'coprologia'])->name('coprologia');
+        Route::get('serologia/{oa}',     [PdfController::class, 'serologia'])->name('serologia');
         Route::get('digestion/{oa}',     [PdfController::class, 'digestion'])->name('digestion');
         Route::get('varios/{oa}',        [PdfController::class, 'varios'])->name('varios');
         Route::get('orden/{orden}',      [PdfController::class, 'ordenCompleta'])->name('orden');
