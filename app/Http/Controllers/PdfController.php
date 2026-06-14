@@ -9,20 +9,8 @@ class PdfController extends Controller
 {
     private function verificarAcceso(OrdenAnalisis $oa): void
     {
-        $user = auth()->user();
-
-        if ($user->hasRole('admin') || $user->email === 'mirym@laboclypsa.com') return;
-
-        $oa->loadMissing('orden');
-
-        if ($user->laboratorio_id !== null && (int) $oa->orden->laboratorio_id === (int) $user->laboratorio_id) return;
-
-        if ((int) $oa->orden->creado_por === (int) $user->id) return;
-
-        throw new \Illuminate\Http\Exceptions\HttpResponseException(
-            redirect()->route('ordenes.show', $oa->orden_id)
-                ->with('error', 'No tienes acceso a resultados de este laboratorio.')
-        );
+        // Ambas sedes comparten acceso completo a todos los resultados.
+        // La autenticación ya está garantizada por el middleware 'auth' en las rutas.
     }
 
     public function hematologia(OrdenAnalisis $oa)

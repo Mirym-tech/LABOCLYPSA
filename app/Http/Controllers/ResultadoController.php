@@ -29,26 +29,8 @@ class ResultadoController extends Controller
 
     private function verificarAcceso(OrdenAnalisis $oa): void
     {
-        $user = auth()->user();
-
-        // Admin siempre pasa (doble chequeo: rol + email por si hay caché stale)
-        if ($user->hasRole('admin') || $user->email === 'mirym@laboclypsa.com') return;
-
-        $oa->loadMissing('orden.laboratorio');
-
-        // Pasa si la orden es del laboratorio asignado al usuario (comparación no estricta para evitar int/string mismatch)
-        if ($user->laboratorio_id !== null && (int) $oa->orden->laboratorio_id === (int) $user->laboratorio_id) return;
-
-        // Pasa si el usuario mismo creó la orden
-        if ((int) $oa->orden->creado_por === (int) $user->id) return;
-
-        $labOrden   = $oa->orden->laboratorio?->nombre ?? "ID {$oa->orden->laboratorio_id}";
-        $labUsuario = $user->laboratorio?->nombre       ?? ($user->laboratorio_id ? "ID {$user->laboratorio_id}" : 'sin laboratorio asignado');
-
-        throw new \Illuminate\Http\Exceptions\HttpResponseException(
-            redirect()->route('ordenes.show', $oa->orden_id)
-                ->with('error', "No tienes acceso: la orden pertenece a «{$labOrden}» y tú estás asignado/a a «{$labUsuario}». Pide al administrador que corrija tu laboratorio.")
-        );
+        // Ambas sedes comparten acceso completo a todos los resultados.
+        // La autenticación ya está garantizada por el middleware 'auth' en las rutas.
     }
 
     private function datosResultado(Request $request): array
