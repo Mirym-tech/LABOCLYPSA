@@ -2,21 +2,34 @@
 @section('title', 'Uroanálisis — ' . $oa->orden->numero_orden)
 
 @section('content')
-@php $paciente = $oa->orden->paciente; @endphp
+@php
+$paciente  = $oa->orden->paciente;
+$nombreTipo = strtolower($oa->tipo->nombre ?? '');
+$esCopro   = str_contains($nombreTipo, 'coprol');
+$esUro     = !$esCopro && (str_contains($nombreTipo, 'orina') || str_contains($nombreTipo, 'uro'));
+$ambos     = !$esCopro && !$esUro;   // si no matchea ninguno, mostrar ambos
+$mostrarUro = $esUro  || $ambos;
+$mostrarCop = $esCopro || $ambos;
+$tabInicial = $esCopro ? 'cop' : 'uro';
+$titulo     = $ambos ? 'Uroanálisis / Coprológico' : ($esCopro ? 'Coprológico' : 'Uroanálisis');
+@endphp
 
 <div class="flex flex-wrap items-start gap-2 mb-4">
     <a href="{{ route('ordenes.show', $oa->orden_id) }}" class="text-gray-400 hover:text-gray-600 mt-1 flex-shrink-0"><i class="fas fa-arrow-left"></i></a>
     <div class="min-w-0 flex-1">
-        <h1 class="text-lg sm:text-xl font-bold text-gray-800 leading-tight">Uroanálisis / Coprológico — Orden <span class="text-blue-600 font-mono">{{ $oa->orden->numero_orden }}</span></h1>
+        <h1 class="text-lg sm:text-xl font-bold text-gray-800 leading-tight">{{ $titulo }} — Orden <span class="text-blue-600 font-mono">{{ $oa->orden->numero_orden }}</span></h1>
         <p class="text-sm text-gray-500">{{ $paciente->nombre }}</p>
     </div>
 </div>
 
-<div x-data="{ tab: 'uro' }">
+<div x-data="{ tab: '{{ $tabInicial }}' }">
+{{-- Pestañas: solo si hay ambos tipos --}}
+@if($ambos)
 <div class="flex gap-1 mb-4 bg-gray-200 p-1 rounded-lg w-fit">
     <button @click="tab='uro'" :class="tab==='uro' ? 'bg-white shadow text-blue-700':'text-gray-600'" class="px-5 py-2 rounded-md text-sm font-medium">Uroanálisis</button>
     <button @click="tab='cop'" :class="tab==='cop' ? 'bg-white shadow text-blue-700':'text-gray-600'" class="px-5 py-2 rounded-md text-sm font-medium">Coprológico</button>
 </div>
+@endif
 
 <form method="POST" action="{{ route('resultados.uroanalisis.guardar', $oa) }}">
 @csrf
@@ -33,6 +46,7 @@
 </div>
 
 {{-- Tab Uroanálisis --}}
+@if($mostrarUro)
 <div x-show="tab==='uro'">
 <div class="bg-white rounded-xl shadow-sm p-5 space-y-5">
     @php $u = $uro; @endphp
@@ -92,8 +106,10 @@
 </div>
 </div>
 
+@endif
 {{-- Tab Coprológico --}}
-<div x-show="tab==='cop'" style="display:none">
+@if($mostrarCop)
+<div x-show="tab==='cop'"@if($ambos) style="display:none"@endif>
 @php $c = $cop; @endphp
 <div class="bg-white rounded-xl shadow-sm p-5 space-y-4">
     <div class="grid grid-cols-3 gap-4">
@@ -120,6 +136,7 @@
     </div>
 </div>
 </div>
+@endif
 
 <div class="sticky bottom-0 z-10 bg-white border-t border-gray-200 shadow-md
             -mx-3 lg:-mx-6 px-3 lg:px-6 py-3 mt-4 flex gap-3">
