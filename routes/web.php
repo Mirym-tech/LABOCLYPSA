@@ -34,6 +34,7 @@ Route::middleware(['auth', 'forzar-lab'])->group(function () {
         ->except(['edit', 'update', 'destroy'])
         ->parameters(['ordenes' => 'orden']);
     Route::post('ordenes/{orden}/validar', [OrdenController::class, 'validar'])->name('ordenes.validar');
+    Route::post('ordenes/{orden}/agregar-analisis', [OrdenController::class, 'agregarAnalisis'])->name('ordenes.agregarAnalisis');
 
     // Resultados — rutas específicas por tipo de análisis
     Route::prefix('resultados')->name('resultados.')->group(function () {

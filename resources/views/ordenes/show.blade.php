@@ -3,6 +3,17 @@
 
 @section('content')
 
+@if(session('success'))
+<div class="mb-4 p-3 bg-green-100 border border-green-300 text-green-800 rounded-lg text-sm flex items-center gap-2">
+    <i class="fas fa-check-circle"></i> {{ session('success') }}
+</div>
+@endif
+@if(session('error'))
+<div class="mb-4 p-3 bg-red-100 border border-red-300 text-red-800 rounded-lg text-sm flex items-center gap-2">
+    <i class="fas fa-exclamation-circle"></i> {{ session('error') }}
+</div>
+@endif
+
 {{-- Encabezado responsive --}}
 <div class="flex flex-wrap items-start gap-2 mb-6">
     <a href="{{ route('ordenes.index') }}" class="text-gray-400 hover:text-gray-600 mt-1 flex-shrink-0"><i class="fas fa-arrow-left"></i></a>
@@ -224,4 +235,53 @@
         </tbody>
     </table>
 </div>
+
+@if($categorias->isNotEmpty())
+{{-- Agregar análisis a la orden --}}
+<div class="mt-6" x-data="{ abierto: false }">
+    <button @click="abierto = !abierto"
+            class="w-full flex items-center justify-between bg-white rounded-xl shadow-sm px-5 py-4 text-left hover:bg-gray-50 transition-colors">
+        <span class="font-semibold text-gray-700">
+            <i class="fas fa-plus-circle text-blue-500 mr-2"></i>Agregar Análisis a esta Orden
+        </span>
+        <i class="fas fa-chevron-down text-gray-400 transition-transform duration-200" :class="abierto ? 'rotate-180' : ''"></i>
+    </button>
+
+    <div x-show="abierto" x-transition class="mt-2 bg-white rounded-xl shadow-sm p-5">
+        <form method="POST" action="{{ route('ordenes.agregarAnalisis', $orden) }}">
+            @csrf
+            @error('analisis_ids')
+                <p class="text-red-600 text-sm mb-3"><i class="fas fa-exclamation-circle mr-1"></i>{{ $message }}</p>
+            @enderror
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-5">
+                @foreach($categorias as $cat => $tipos)
+                <div class="border border-gray-100 rounded-lg p-4">
+                    <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 pb-2 border-b">{{ $cat }}</h3>
+                    <div class="space-y-2">
+                        @foreach($tipos as $tipo)
+                        <label class="flex items-start gap-2 cursor-pointer group">
+                            <input type="checkbox" name="analisis_ids[]" value="{{ $tipo->id }}"
+                                   class="mt-0.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <span class="text-sm leading-tight group-hover:text-blue-700">
+                                <span class="font-mono text-blue-500 text-xs">{{ $tipo->codigo }}</span>
+                                {{ $tipo->nombre }}
+                            </span>
+                        </label>
+                        @endforeach
+                    </div>
+                </div>
+                @endforeach
+            </div>
+
+            <div class="flex justify-end">
+                <button type="submit"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
+                    <i class="fas fa-plus"></i> Agregar Seleccionados
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+@endif
 @endsection

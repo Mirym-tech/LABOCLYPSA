@@ -98,7 +98,47 @@ class OrdenController extends Controller
             'analisis.resultadoDigestion',
             'analisis.resultadoVarios',
         ]);
-        return view('ordenes.show', compact('orden'));
+
+        $tiposExistentes = $orden->analisis->pluck('analisis_tipo_id')->toArray();
+        $categorias = AnalisisTipo::where('activo', true)
+            ->whereNotIn('id', $tiposExistentes)
+            ->orderBy('categoria')->orderBy('nombre')
+            ->get()->groupBy('categoria');
+
+        return view('ordenes.show', compact('orden', 'categorias'));
+    }
+
+    public function agregarAnalisis(Request $request, Orden $orden)
+    {
+        $request->validate([
+            'analisis_ids'   => 'required|array|min:1',
+            'analisis_ids.*' => 'exists:analisis_tipos,id',
+        ]);
+
+        $tiposExistentes = $orden->analisis()->pluck('analisis_tipo_id')->toArray();
+        $nuevos = collect($request->analisis_ids)
+            ->filter(fn ($id) => !in_array((int) $id, $tiposExistentes))
+            ->values();
+
+        if ($nuevos->isEmpty()) {
+            return back()->with('error', 'Los análisis seleccionados ya están en esta orden.');
+        }
+
+        $now = now();
+        OrdenAnalisis::insert(
+            $nuevos->map(fn ($id) => [
+                'orden_id'         => $orden->id,
+                'analisis_tipo_id' => (int) $id,
+                'estado'           => 'pendiente',
+                'created_at'       => $now,
+                'updated_at'       => $now,
+            ])->toArray()
+        );
+
+        activity()->on($orden)->log('Agregados ' . $nuevos->count() . ' análisis a la orden');
+
+        return redirect()->route('ordenes.show', $orden)
+            ->with('success', $nuevos->count() . ' análisis agregado(s) a la orden.');
     }
 
     public function validar(Orden $orden)
