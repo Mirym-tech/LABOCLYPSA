@@ -86,13 +86,21 @@
         </div>
         <div>
             <label class="label">Laboratorio *</label>
-            <select name="laboratorio_id" class="input" required>
-                @foreach($laboratorios as $lab)
-                    <option value="{{ $lab->id }}" {{ session('laboratorio_activo_id') == $lab->id ? 'selected' : '' }}>
-                        {{ $lab->nombre }}
-                    </option>
-                @endforeach
-            </select>
+            @if(auth()->user()->email !== 'mirym@laboclypsa.com' && auth()->user()->laboratorio_id)
+                {{-- Usuarios normales: bloqueado a su propio laboratorio --}}
+                <input type="hidden" name="laboratorio_id" value="{{ auth()->user()->laboratorio_id }}">
+                <input type="text" value="{{ auth()->user()->laboratorio?->nombre }}" class="input bg-gray-100 text-gray-500 cursor-not-allowed" disabled>
+            @else
+                {{-- Admin: puede seleccionar cualquier laboratorio --}}
+                @php $labDefault = old('laboratorio_id', auth()->user()->laboratorio_id ?? session('laboratorio_activo_id')); @endphp
+                <select name="laboratorio_id" class="input" required>
+                    @foreach($laboratorios as $lab)
+                        <option value="{{ $lab->id }}" {{ $labDefault == $lab->id ? 'selected' : '' }}>
+                            {{ $lab->nombre }}
+                        </option>
+                    @endforeach
+                </select>
+            @endif
         </div>
     </div>
 
